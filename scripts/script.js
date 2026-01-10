@@ -1,5 +1,5 @@
 import { loadStateMachine } from './stateMachine.js';
-import { setupHubspots, initSecretInput, getHubspots } from './hubspots.js';
+import { setupHubspots, initSecretInput, getHubspots, initAccessibility } from './hubspots.js';
 import { setupResizeHandler } from './resizeHandler.js';
 import { initInventory } from './inventory.js';
 import { initFlags } from './flags.js';
@@ -11,6 +11,7 @@ async function init() {
         initInventory();
         initFlags();
         initSecretInput();
+        initAccessibility();
         await setupHubspots();
         setupResizeHandler();
 
