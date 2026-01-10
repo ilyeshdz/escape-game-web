@@ -32,6 +32,41 @@
     "modalText": "Le coffre-fort est déjà ouvert."
   },
   {
+    "id": "testItems",
+    "x": 10,
+    "y": 80,
+    "type": "modal",
+    "visibleIn": ["room1", "safeOpen"],
+    "tooltip": "Coffre au trésor",
+    "modalText": "Vous trouvez un coffre au trésor avec plusieurs objets à l'intérieur!",
+    "giveItems": [
+      {
+        "id": "potion",
+        "name": "Potion de soin",
+        "description": "Restaure 50 points de vie.",
+        "emoji": "🧪"
+      },
+      {
+        "id": "scroll",
+        "name": "Grimoire",
+        "description": "Un ancien livre de sorts.",
+        "emoji": "📜"
+      },
+      {
+        "id": "gem",
+        "name": "Pierre précieuse",
+        "description": "Une gemme qui brille dans l'obscurité.",
+        "emoji": "💎"
+      },
+      {
+        "id": "apple",
+        "name": "Pomme",
+        "description": "Une pomme rouge et croquante.",
+        "emoji": "🍎"
+      }
+    ]
+  },
+  {
     "id": "safeSuccess",
     "x": 80,
     "y": 80,
@@ -44,7 +79,7 @@
         "id": "goldenKey",
         "name": "Clé dorée",
         "description": "Une clé dorée qui brille légèrement. Elle semble faite pour ouvrir une serrure spéciale.",
-        "icon": "",
+        "emoji": "🔑",
         "usable": true,
         "consumable": true
       }
