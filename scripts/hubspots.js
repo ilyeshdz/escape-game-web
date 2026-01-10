@@ -9,6 +9,7 @@ let hubspotsData = [];
 let activeHubspots = [];
 let currentSecretHubspotData = null;
 const autoShownHubspots = new Set();
+let lastFocusedElement = null;
 
 const hubspotHandlers = {
     area: handleAreaAction,
@@ -24,6 +25,7 @@ function executeHubspotActions(hubspotData) {
     if (hubspotData.giveItems) {
         hubspotData.giveItems.forEach(item => {
             if (addItem(item)) {
+                announce(`Objet ajouté: ${item.name}`);
                 if (item.pickupMessage) {
                     setTimeout(() => showModal(item.pickupMessage), 100);
                 }
@@ -31,13 +33,22 @@ function executeHubspotActions(hubspotData) {
         });
     }
     if (hubspotData.giveFlags) {
-        hubspotData.giveFlags.forEach(setFlag);
+        hubspotData.giveFlags.forEach(flag => {
+            setFlag(flag);
+            announce(`État changé: ${flag}`);
+        });
     }
     if (hubspotData.removeFlags) {
-        hubspotData.removeFlags.forEach(unsetFlag);
+        hubspotData.removeFlags.forEach(flag => {
+            unsetFlag(flag);
+            announce(`État terminé: ${flag}`);
+        });
     }
     if (hubspotData.removeItems) {
-        hubspotData.removeItems.forEach(removeItem);
+        hubspotData.removeItems.forEach(itemId => {
+            removeItem(itemId);
+            announce(`Objet utilisé et retiré`);
+        });
     }
 }
 
@@ -161,9 +172,13 @@ function updateHubspotsVisibility() {
 function showModal(text) {
     const modal = document.getElementById('modal');
     const modalText = document.getElementById('modal-text');
+    const closeBtn = modal?.querySelector('.modal-close');
+    
     if (modal && modalText) {
+        lastFocusedElement = document.activeElement;
         modalText.innerHTML = text;
         modal.classList.add('active');
+        closeBtn?.focus();
     }
 }
 
@@ -171,16 +186,30 @@ function closeModal() {
     const modal = document.getElementById('modal');
     if (modal) {
         modal.classList.remove('active');
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+        }
     }
 }
 
 window.closeModal = closeModal;
 
+export function announce(message) {
+    const announcer = document.getElementById('a11y-announcer');
+    if (announcer) {
+        announcer.textContent = message;
+        setTimeout(() => { announcer.textContent = ''; }, 1000);
+    }
+}
+
 function showFinish(win) {
     const finish = document.getElementById('finish');
     const finishMessage = document.getElementById('finish-message');
     const finishSubtitle = document.getElementById('finish-subtitle');
+    const restartBtn = document.getElementById('restart-btn');
     if (finish && finishMessage) {
+        lastFocusedElement = document.activeElement;
         finishMessage.textContent = win ? 'Félicitations !' : 'Dommage...';
         if (finishSubtitle) {
             finishSubtitle.textContent = win
@@ -190,6 +219,7 @@ function showFinish(win) {
         finish.classList.add('active');
         finish.classList.toggle('win', win);
         finish.classList.toggle('lose', !win);
+        restartBtn?.focus();
     }
 }
 
@@ -246,19 +276,39 @@ function checkSecret() {
 export function initSecretInput() {
     const secretClose = document.getElementById('secret-close');
     const inspectClose = document.getElementById('inspect-close');
+    const secretModalElement = document.getElementById('secret-modal');
+    const inspectModalElement = document.getElementById('item-inspect-modal');
     
     secretSubmit.addEventListener('click', checkSecret);
-    secretCancel.addEventListener('click', () => secretModal.classList.remove('active'));
+    secretCancel.addEventListener('click', () => {
+        secretModal.classList.remove('active');
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+        }
+    });
     secretInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkSecret());
     
     if (secretClose) {
-        secretClose.addEventListener('click', () => secretModal.classList.remove('active'));
+        secretClose.addEventListener('click', () => {
+            secretModal.classList.remove('active');
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+                lastFocusedElement = null;
+            }
+        });
     }
     
     if (inspectClose) {
         inspectClose.addEventListener('click', () => {
             const modal = document.getElementById('item-inspect-modal');
-            if (modal) modal.classList.remove('active');
+            if (modal) {
+                modal.classList.remove('active');
+                if (lastFocusedElement) {
+                    lastFocusedElement.focus();
+                    lastFocusedElement = null;
+                }
+            }
         });
     }
 
@@ -268,6 +318,35 @@ export function initSecretInput() {
             secretModal.classList.remove('active');
             const inspectModal = document.getElementById('item-inspect-modal');
             if (inspectModal) inspectModal.classList.remove('active');
+            const finish = document.getElementById('finish');
+            if (finish) finish.classList.remove('active');
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+                lastFocusedElement = null;
+            }
+        }
+
+        if (e.key === 'Tab') {
+            const activeModal = document.querySelector('.modal.active');
+            const finishActive = document.querySelector('.finish.active');
+            const activeElement = activeModal || finishActive;
+            if (!activeElement) return;
+
+            const focusable = activeElement.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusable.length === 0) return;
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
         }
     });
 }
@@ -282,4 +361,61 @@ function showSecretInput(hubspotData) {
     }
     secretModal.classList.add('active');
     secretInput.focus();
+}
+
+export function initAccessibility() {
+    const toggleHelp = document.getElementById('toggle-help');
+    const helpPanel = document.getElementById('keyboard-help');
+
+    if (toggleHelp && helpPanel) {
+        toggleHelp.addEventListener('click', () => {
+            const isHidden = helpPanel.hidden;
+            helpPanel.hidden = !isHidden;
+            toggleHelp.setAttribute('aria-expanded', isHidden);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!toggleHelp.contains(e.target) && !helpPanel.contains(e.target) && !helpPanel.hidden) {
+                helpPanel.hidden = true;
+                toggleHelp.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    initLandscapeWarning();
+}
+
+function initLandscapeWarning() {
+    const warning = document.getElementById('landscape-warning');
+    const dismissBtn = document.querySelector('.landscape-dismiss');
+    
+    if (!warning) return;
+
+    const checkOrientation = () => {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const isSmallScreen = window.innerWidth <= 600;
+        const wasDismissed = sessionStorage.getItem('landscape-warning-dismissed');
+
+        if (isLandscape && isSmallScreen && !wasDismissed) {
+            warning.hidden = false;
+            warning.setAttribute('aria-hidden', 'false');
+        } else {
+            warning.hidden = true;
+            warning.setAttribute('aria-hidden', 'true');
+        }
+    };
+
+    if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+            warning.hidden = true;
+            warning.setAttribute('aria-hidden', 'true');
+            sessionStorage.setItem('landscape-warning-dismissed', 'true');
+        });
+    }
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(checkOrientation, 100);
+    });
 }
