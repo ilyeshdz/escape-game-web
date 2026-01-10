@@ -17,7 +17,6 @@ const hubspotHandlers = {
     finish: handleFinishAction,
     link: handleLinkAction,
     secret: showSecretInput,
-    pickup: handlePickup,
     useItem: handleUseItem,
 };
 
@@ -80,21 +79,6 @@ function handleFinishAction(hubspotData) {
 function handleLinkAction(hubspotData) {
     if (hubspotData.url) {
         window.open(hubspotData.url, '_blank');
-    }
-}
-
-function handlePickup(hubspotData) {
-    if (!checkInventoryCondition({ requireItems: hubspotData.requireItems, requireAnyItems: hubspotData.requireAnyItems })) {
-        if (hubspotData.requireMessage) showModal(hubspotData.requireMessage);
-        return;
-    }
-    if (hubspotData.item && addItem(hubspotData.item)) {
-        if (hubspotData.item.pickupMessage) showModal(hubspotData.item.pickupMessage);
-        updateHubspotsVisibility();
-    }
-    if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
-        executeHubspotActions(hubspotData);
-        updateHubspotsVisibility();
     }
 }
 
@@ -195,8 +179,14 @@ window.closeModal = closeModal;
 function showFinish(win) {
     const finish = document.getElementById('finish');
     const finishMessage = document.getElementById('finish-message');
+    const finishSubtitle = document.getElementById('finish-subtitle');
     if (finish && finishMessage) {
-        finishMessage.textContent = win ? 'Vous avez gagné !' : 'Vous avez perdu !';
+        finishMessage.textContent = win ? 'Félicitations !' : 'Dommage...';
+        if (finishSubtitle) {
+            finishSubtitle.textContent = win
+                ? 'Vous avez réussi à vous échapper !'
+                : 'Peut-être une prochaine fois...';
+        }
         finish.classList.add('active');
         finish.classList.toggle('win', win);
         finish.classList.toggle('lose', !win);
@@ -271,6 +261,15 @@ export function initSecretInput() {
             if (modal) modal.classList.remove('active');
         });
     }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+            secretModal.classList.remove('active');
+            const inspectModal = document.getElementById('item-inspect-modal');
+            if (inspectModal) inspectModal.classList.remove('active');
+        }
+    });
 }
 
 function showSecretInput(hubspotData) {
