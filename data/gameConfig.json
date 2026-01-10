@@ -1,0 +1,15 @@
+{
+  "initialState": "room1",
+  "initialFlags": {},
+  "transitions": {
+    "room1": {
+      "openSafe": "safeOpen",
+      "escape": "finished"
+    },
+    "safeOpen": {
+      "unlockDoor": "safeOpen",
+      "escape": "finished"
+    },
+    "finished": {}
+  }
+}

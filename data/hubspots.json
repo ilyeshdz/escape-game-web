@@ -1,0 +1,91 @@
+[
+  {
+    "id": "painting",
+    "x": 20,
+    "y": 30,
+    "type": "modal",
+    "visibleIn": ["room1", "safeOpen", "finished"],
+    "tooltip": "Peinture mystérieuse",
+    "modalText": "Vous remarquez un curieux tableau représentant un coffre avec les chiffres 1-2-3-4 peints en rouge."
+  },
+  {
+    "id": "safe",
+    "x": 60,
+    "y": 60,
+    "type": "secret",
+    "visibleIn": ["room1"],
+    "tooltip": "Coffre-fort",
+    "prompt": "Entrez le code du coffre-fort:",
+    "secretCode": "1234",
+    "onSuccess": {
+      "type": "action",
+      "action": "openSafe"
+    }
+  },
+  {
+    "id": "safeOpened",
+    "x": 50,
+    "y": 50,
+    "type": "modal",
+    "visibleIn": ["safeOpen", "finished"],
+    "tooltip": "Coffre-fort ouvert",
+    "modalText": "Le coffre-fort est déjà ouvert."
+  },
+  {
+    "id": "safeSuccess",
+    "x": 80,
+    "y": 80,
+    "type": "modal",
+    "visibleIn": ["safeOpen"],
+    "autoShow": true,
+    "tooltip": "",
+    "modalText": "<strong>Le coffre s'ouvre!</strong><br><br>À l'intérieur, vous trouvez une clé dorée.",
+    "giveItems": [
+      {
+        "id": "goldenKey",
+        "name": "Clé dorée",
+        "description": "Une clé dorée qui brille légèrement. Elle semble faite pour ouvrir une serrure spéciale.",
+        "icon": "",
+        "usable": true,
+        "consumable": true
+      }
+    ]
+  },
+  {
+    "id": "doorLocked",
+    "x": 80,
+    "y": 40,
+    "type": "modal",
+    "size": 150,
+    "visibleIn": ["room1", "safeOpen"],
+    "tooltip": "Porte verrouillée",
+    "modalText": "La porte est verrouillée. Vous avez besoin de la clé dorée pour l'ouvrir.",
+    "requireNotItems": ["goldenKey"]
+  },
+  {
+    "id": "doorUnlocked",
+    "x": 80,
+    "y": 50,
+    "type": "useItem",
+    "size": 150,
+    "visibleIn": ["room1", "safeOpen"],
+    "requireItems": ["goldenKey"],
+    "tooltip": "Porte",
+    "noItemMessage": "La porte est verrouillée. Sélectionnez la clé dorée dans l'inventaire, puis cliquez sur la porte.",
+    "wrongItemMessage": "Cet objet ne sert à rien ici.",
+    "action": "unlockDoor",
+    "giveFlags": ["doorUnlocked"]
+  },
+  {
+    "id": "doorExit",
+    "x": 80,
+    "y": 25,
+    "type": "finish",
+    "size": 150,
+    "visibleIn": ["room1", "safeOpen"],
+    "requireFlags": ["doorUnlocked"],
+    "tooltip": "Sortir",
+    "action": "escape",
+    "win": true
+  }
+]
