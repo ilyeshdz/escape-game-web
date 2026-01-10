@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,37 +7,53 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a href="#game-canvas" class="skip-link">Aller au jeu</a>
+    <div id="a11y-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
     <div class="game-container">
-        <canvas id="game-canvas"></canvas>
+        <canvas id="game-canvas" role="img" aria-label="Scène du jeu. Utilisez Tab pour naviguer entre les éléments interactifs." tabindex="0"></canvas>
     </div>
-    <div id="modal" class="modal" onclick="if(event.target === this) window.closeModal()">
+    <button id="toggle-help" class="toggle-help" aria-expanded="false" aria-controls="keyboard-help" aria-label="Afficher les raccourcis clavier">⌨️</button>
+    <div id="keyboard-help" class="keyboard-help" role="region" aria-label="Aide clavier" hidden>
+        <span><kbd>Tab</kbd> Naviguer</span>
+        <span><kbd>Entrée</kbd> Activer</span>
+        <span><kbd>Échap</kbd> Fermer</span>
+    </div>
+    <div id="landscape-warning" class="landscape-warning" role="alert" aria-hidden="true" hidden>
+        <div class="landscape-warning-content">
+            <span class="landscape-icon">📱</span>
+            <p>Passez en mode portrait pour une meilleure expérience</p>
+            <button class="landscape-dismiss" aria-label="Masquer ce message">×</button>
+        </div>
+    </div>
+    <div id="modal" class="modal" onclick="if(event.target === this) window.closeModal()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-paper">
-            <button class="modal-close" onclick="window.closeModal()">×</button>
+            <button class="modal-close" onclick="window.closeModal()" aria-label="Fermer">×</button>
+            <h2 id="modal-title" class="sr-only">Message</h2>
             <div id="modal-text" class="modal-text"></div>
         </div>
     </div>
-    <div id="finish" class="finish">
+    <div id="finish" class="finish" role="dialog" aria-modal="true" aria-labelledby="finish-message">
         <div class="finish-content">
             <h2 id="finish-message"></h2>
             <p id="finish-subtitle" class="finish-subtitle"></p>
-            <button id="restart-btn" class="secret-button" style="margin-top: 20px;" onclick="location.reload()">Rejouer</button>
+            <button id="restart-btn" class="secret-button" style="margin-top: 20px;" onclick="location.reload()" aria-label="Recommencer le jeu">Rejouer</button>
         </div>
     </div>
-    <div id="secret-modal" class="modal">
+    <div id="secret-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="secret-prompt">
         <div class="modal-paper secret-paper">
-            <button class="modal-close" id="secret-close">×</button>
+            <button class="modal-close" id="secret-close" aria-label="Fermer le code secret">×</button>
             <div id="secret-prompt" class="secret-prompt"></div>
-            <input type="text" id="secret-input" class="secret-input" placeholder="Code secret">
+            <input type="text" id="secret-input" class="secret-input" placeholder="Code secret" aria-label="Entrez le code secret">
             <div id="secret-error" class="secret-error"></div>
             <div class="secret-buttons">
-                <button id="secret-submit" class="secret-button">Valider</button>
-                <button id="secret-cancel" class="secret-button">Annuler</button>
+                <button id="secret-submit" class="secret-button" aria-label="Valider le code">Valider</button>
+                <button id="secret-cancel" class="secret-button" aria-label="Annuler">Annuler</button>
             </div>
         </div>
     </div>
-    <div id="item-inspect-modal" class="modal">
+    <div id="item-inspect-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="inspect-item-title">
         <div class="modal-paper inspect-paper">
-            <button class="modal-close" id="inspect-close">×</button>
+            <button class="modal-close" id="inspect-close" aria-label="Fermer la description">×</button>
             <img id="inspect-item-icon" class="inspect-item-icon" src="" alt="">
             <h3 id="inspect-item-title" class="inspect-item-title"></h3>
             <p id="inspect-item-description" class="inspect-item-description"></p>
