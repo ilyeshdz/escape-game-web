@@ -18,16 +18,13 @@ class StateMachine {
      */
     transition(action) {
         const nextState = this.transitions[this.currentState]?.[action];
-        console.log(`[StateMachine] Transition attempt: ${this.currentState} --[${action}]--> ${nextState || 'FAILED'}`);
         
         if (nextState) {
             const oldState = this.currentState;
             this.currentState = nextState;
-            console.log(`[StateMachine] ✓ State changed: ${oldState} → ${nextState}`);
             return true;
         }
         
-        console.warn(`[StateMachine] ✗ Transition failed: No transition from "${this.currentState}" with action "${action}"`);
         return false;
     }
 
@@ -52,7 +49,6 @@ export function initStateMachine(config) {
         throw new Error('Invalid state machine configuration: missing initialState or transitions');
     }
     stateMachine = new StateMachine(config.initialState, config.transitions);
-    console.log(`[StateMachine] Initialized with state: ${config.initialState}`);
     return stateMachine;
 }
 
