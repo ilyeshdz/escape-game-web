@@ -131,6 +131,11 @@ function updateInventoryUI() {
                 icon.alt = item.name;
                 icon.className = 'slot-icon';
                 slot.appendChild(icon);
+            } else if (item.emoji) {
+                const emoji = document.createElement('span');
+                emoji.textContent = item.emoji;
+                emoji.className = 'slot-emoji';
+                slot.appendChild(emoji);
             } else {
                 const text = document.createElement('span');
                 text.textContent = item.name.substring(0, 2).toUpperCase();
