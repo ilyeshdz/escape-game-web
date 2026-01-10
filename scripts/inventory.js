@@ -3,15 +3,35 @@
  */
 let inventory = [];
 let selectedItem = null;
+const INVENTORY_SIZE = 9;
 
 export function initInventory() {
     inventory = [];
     selectedItem = null;
+    setupInventoryShortcuts();
     updateInventoryUI();
+}
+
+function setupInventoryShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        const key = e.key;
+        if (key >= '1' && key <= '9') {
+            const slotIndex = parseInt(key) - 1;
+            const item = inventory[slotIndex];
+            if (item) {
+                selectItem(selectedItem === item.id ? null : item.id);
+            } else {
+                selectItem(null);
+            }
+        }
+    });
 }
 
 export function addItem(item) {
     if (!item || !item.id || hasItem(item.id)) {
+        return false;
+    }
+    if (inventory.length >= INVENTORY_SIZE) {
         return false;
     }
     inventory.push(item);
@@ -85,32 +105,51 @@ export function inspectItem(itemId) {
 }
 
 function updateInventoryUI() {
-    const inventoryContainer = document.getElementById('inventory-items');
-    if (!inventoryContainer) return;
+    const slotsContainer = document.getElementById('inventory-items');
+    if (!slotsContainer) return;
 
-    inventoryContainer.innerHTML = '';
-    inventory.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'inventory-item';
-        itemElement.dataset.itemId = item.id;
-        itemElement.title = item.name;
-        if (item.icon) {
-            const icon = document.createElement('img');
-            icon.src = item.icon;
-            icon.alt = item.name;
-            itemElement.appendChild(icon);
-        } else {
-            const text = document.createElement('span');
-            text.textContent = item.name.substring(0, 2).toUpperCase();
-            itemElement.appendChild(text);
+    slotsContainer.innerHTML = '';
+    for (let i = 0; i < INVENTORY_SIZE; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'inventory-slot';
+        slot.dataset.slotIndex = i;
+
+        const number = document.createElement('span');
+        number.className = 'slot-number';
+        number.textContent = i + 1;
+        slot.appendChild(number);
+
+        const item = inventory[i];
+        if (item) {
+            slot.classList.add('occupied');
+            slot.dataset.itemId = item.id;
+            slot.title = item.name;
+
+            if (item.icon) {
+                const icon = document.createElement('img');
+                icon.src = item.icon;
+                icon.alt = item.name;
+                icon.className = 'slot-icon';
+                slot.appendChild(icon);
+            } else {
+                const text = document.createElement('span');
+                text.textContent = item.name.substring(0, 2).toUpperCase();
+                text.className = 'slot-text';
+                slot.appendChild(text);
+            }
+
+            if (selectedItem === item.id) {
+                slot.classList.add('selected');
+            }
+
+            slot.addEventListener('click', () => {
+                selectItem(selectedItem === item.id ? null : item.id);
+            });
+            slot.addEventListener('dblclick', () => inspectItem(item.id));
         }
-        if (selectedItem === item.id) {
-            itemElement.classList.add('selected');
-        }
-        itemElement.addEventListener('click', () => selectItem(selectedItem === item.id ? null : item.id));
-        itemElement.addEventListener('dblclick', () => inspectItem(item.id));
-        inventoryContainer.appendChild(itemElement);
-    });
+
+        slotsContainer.appendChild(slot);
+    }
 }
 
 function showInspectModal(item) {
