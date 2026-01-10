@@ -1,180 +1,179 @@
-# Contributing to Escape Game
+# Contribuer au projet Escape Game
 
-Thank you for your interest in contributing! This document outlines the guidelines for contributing to this project.
+Merci de votre intérêt pour ce projet ! Ce document présente les lignes directrices pour contribuer.
 
-## How to Contribute
+## Comment contribuer
 
-### 1. Fork and Clone
+### 1. Fork et clonage
 
 ```bash
-# Fork the repository on GitHub, then clone your fork
+# Forkez le dépôt sur GitHub, puis clonez votre fork
 git clone https://github.com/YOUR_USERNAME/escape-game-web.git
 cd escape-game-web
 ```
 
-### 2. Set Up Development Environment
+### 2. Configuration de l'environnement de développement
 
-This project uses plain HTML, CSS, and JavaScript (ES modules). No build tools required.
+Ce projet utilise HTML, CSS et JavaScript pur (ES modules). Aucun outil de build requis.
 
 ```bash
-# Open in your browser by serving the directory
-# Using Python:
+# Ouvrez dans votre navigateur en servant le répertoire
+# Avec Python:
 python -m http.server 8000
 
-# Or using Node.js (if installed):
+# Ou avec Node.js (si installé):
 npx serve .
 ```
 
-### 3. Create a Branch
+### 3. Créer une branche
 
 ```bash
-# Create a new branch for your changes
-git checkout -b feat/your-feature-name
+# Créez une nouvelle branche pour vos modifications
+git checkout -b feat/nom-de-votre-fonctionnalite
 ```
 
-### 4. Make Changes
+### 4. Faire des modifications
 
-#### Project Structure
+#### Structure du projet
 
 ```
 escape-game-web/
-├── assets/          # Images and game assets
-├── data/            # JSON configuration files
-│   ├── gameConfig.json    # State machine configuration
-│   └── hubspots.json      # Interactive elements
+├── assets/          # Images et ressources du jeu
+├── data/            # Fichiers de configuration JSON
+│   ├── gameConfig.json    # Configuration de la machine à états
+│   └── hubspots.json      # Éléments interactifs
 ├── docs/            # Documentation
 │   ├── getting-started.md
 │   ├── hubspots.md
 │   ├── inventory.md
 │   ├── flags.md
 │   └── statemachine.md
-├── scripts/         # JavaScript modules
-│   ├── canvasScene.js    # Canvas rendering
-│   ├── flags.js          # Flag system
-│   ├── hubspots.js       # Hubspot handlers
-│   ├── hubspotsData.js   # Hubspot data loading
-│   ├── inventory.js      # Inventory system
-│   ├── resizeHandler.js  # Responsive handling
-│   ├── script.js         # Main entry point
-│   └── stateMachine.js   # State machine
-├── style.css        # Main styles
-└── index.html       # Entry HTML file
+├── scripts/         # Modules JavaScript
+│   ├── canvasScene.js    # Rendu canvas
+│   ├── flags.js          # Système de flags
+│   ├── hubspots.js       # Gestionnaires de hubspots
+│   ├── hubspotsData.js   # Chargement des hubspots
+│   ├── inventory.js      # Système d'inventaire
+│   ├── resizeHandler.js  # Gestion du responsive
+│   ├── script.js         # Point d'entrée principal
+│   └── stateMachine.js   # Machine à états
+├── style.css        # Styles principaux
+└── index.html       # Fichier HTML d'entrée
 ```
 
-#### Key Concepts
+#### Concepts clés
 
-**Hubspots** are interactive elements defined in `data/hubspots.json`. Each hubspot has:
-- `id`: Unique identifier
-- `type`: One of: `modal`, `action`, `finish`, `link`, `secret`, `useItem`
+Les **hubspots** sont des éléments interactifs définis dans `data/hubspots.json`. Chaque hubspot possède :
+- `id`: Identifiant unique
+- `type`: Un parmi : `modal`, `action`, `finish`, `link`, `secret`, `useItem`
 - `x`, `y`: Position (0-100%)
-- `visibleIn`: Array of states where the hubspot is visible
-- `emoji`: Optional emoji to display on canvas
+- `visibleIn`: Tableau des états où le hubspot est visible
+- `emoji`: Émoji optionnel à afficher sur le canvas
 
-**Inventory** items can have:
-- `id`, `name`, `description`: Basic properties
-- `emoji`: Optional emoji icon
-- `icon`: Optional image path
-- `usable`: Boolean for item use
-- `consumable`: Boolean for one-time use
+Les objets de l'**inventaire** peuvent avoir :
+- `id`, `name`, `description`: Propriétés de base
+- `emoji`: Icône optionnelle (emoji)
+- `icon`: Chemin optionnel vers une image
+- `usable`: Booléen pour l'utilisation de l'objet
+- `consumable`: Booléen pour une utilisation unique
 
-**State Machine** transitions are defined in `data/gameConfig.json`.
+Les transitions de la **machine à états** sont définies dans `data/gameConfig.json`.
 
-### 5. Test Your Changes
+### 5. Tester vos modifications
 
-1. Open `index.html` in your browser
-2. Test the feature thoroughly
-3. Check for console errors
-4. Verify responsive behavior
+1. Ouvrez `index.html` dans votre navigateur
+2. Testez la fonctionnalité en profondeur
+3. Vérifiez l'absence d'erreurs dans la console
+4. Vérifiez le comportement responsive
 
-### 6. Commit Your Changes
+### 6. Valider vos modifications
 
-Use [Conventional Commits](https://www.conventionalcommits.org/):
-
-```bash
-# Examples:
-git commit -m "feat: add new hubspot type"
-git commit -m "fix: resolve inventory persistence issue"
-git commit -m "docs: update getting started guide"
-git commit -m "style: improve finish screen appearance"
-```
-
-**Commit types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: CSS/styling changes
-- `refactor`: Code refactoring
-- `test`: Adding tests
-- `chore`: Maintenance tasks
-
-### 7. Push and Create PR
+Utilisez les [Conventional Commits](https://www.conventionalcommits.org/) :
 
 ```bash
-git push origin feat/your-feature-name
+# Exemples :
+git commit -m "feat: ajouter un nouveau type de hubspot"
+git commit -m "fix: résoudre le problème de persistance de l'inventaire"
+git commit -m "docs: mettre à jour le guide de démarrage"
+git commit -m "style: améliorer l'apparence de l'écran de fin"
 ```
 
-Then create a Pull Request on GitHub.
+**Types de commits :**
+- `feat` : Nouvelle fonctionnalité
+- `fix` : Correction de bug
+- `docs` : Modifications de documentation
+- `style` : Modifications CSS/stylage
+- `refactor` : Refactorisation du code
+- `test` : Ajout de tests
+- `chore` : Tâches de maintenance
 
-## Code Style Guidelines
+### 7. Pusher et créer une PR
+
+```bash
+git push origin feat/nom-de-votre-fonctionnalite
+```
+
+Créez ensuite une Pull Request sur GitHub.
+
+## Conventions de code
 
 ### JavaScript
 
-- Use ES6 modules (`import`/`export`)
-- Use `const` by default, `let` when needed
-- Use template literals for string concatenation
-- Use arrow functions for callbacks
-- Add JSDoc comments for functions
+- Utilisez les modules ES6 (`import`/`export`)
+- Utilisez `const` par défaut, `let` quand nécessaire
+- Utilisez les littéraux de gabarit pour la concaténation
+- Utilisez les fonctions fléchées pour les callbacks
+- Ajoutez des commentaires JSDoc pour les fonctions
 
 ```javascript
 /**
- * Adds an item to the inventory
- * @param {Object} item - Item to add
- * @returns {boolean} True if item was added
+ * Ajoute un objet à l'inventaire
+ * @param {Object} objet - L'objet à ajouter
+ * @returns {boolean} Vrai si l'objet a été ajouté
  */
-export function addItem(item) {
+export function addItem(objet) {
     // ...
 }
 ```
 
 ### CSS
 
-- Use CSS custom properties for colors
-- Keep styles modular
-- Use `rem` for sizing
-- Mobile-first approach
+- Utilisez les propriétés personnalisées CSS pour les couleurs
+- Gardez les styles modulaires
+- Utilisez `rem` pour les tailles
+- Approche mobile-first
 
 ### JSON
 
-- Use consistent indentation (2 spaces)
-- Add comments where helpful (JSON allows this in some parsers)
-- Validate JSON syntax
+- Utilisez une indentation cohérente (2 espaces)
+- Validez la syntaxe JSON
 
-## Testing Checklist
+## Liste de vérification des tests
 
-Before submitting a PR, verify:
+Avant de soumettre une PR, vérifiez :
 
-- [ ] No console errors
-- [ ] Works on different screen sizes
-- [ ] Inventory persists correctly
-- [ ] State transitions work as expected
-- [ ] Hubspot visibility conditions work
-- [ ] Documentation is updated if needed
+- [ ] Pas d'erreurs dans la console
+- [ ] Fonctionne sur différentes tailles d'écran
+- [ ] L'inventaire persiste correctement
+- [ ] Les transitions d'état fonctionnent comme prévu
+- [ ] Les conditions de visibilité des hubspots fonctionnent
+- [ ] La documentation est mise à jour si nécessaire
 
-## Reporting Issues
+## Signaler des problèmes
 
-When reporting issues, include:
+Lorsque vous signalez des problèmes, incluez :
 
-1. **Browser and version** (e.g., Chrome 120)
-2. **Operating system** (e.g., macOS 14)
-3. **Steps to reproduce**
-4. **Expected behavior**
-5. **Actual behavior**
-6. **Screenshots** if applicable
+1. **Navigateur et version** (ex: Chrome 120)
+2. **Système d'exploitation** (ex: macOS 14)
+3. **Étapes pour reproduire**
+4. **Comportement attendu**
+5. **Comportement actuel**
+6. **Captures d'écran** si applicable
 
-## Questions?
+## Questions ?
 
-Feel free to open an issue for discussion or ask questions.
+N'hésitez pas à ouvrir une issue pour discuter ou poser des questions.
 
-## License
+## Licence
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+En contribuant, vous acceptez que vos contributions soient sous licence MIT.
