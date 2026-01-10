@@ -295,9 +295,9 @@ body {
     height: 60px;
     min-width: 60px;
     min-height: 60px;
-    border: 2px solid rgba(100, 100, 100, 0.6);
+    border: 2px solid rgba(80, 80, 80, 0.5);
     border-radius: 6px;
-    background: rgba(50, 50, 50, 0.5);
+    background: rgba(30, 30, 30, 0.4);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -306,14 +306,15 @@ body {
     position: relative;
 }
 
-.inventory-slot:hover {
-    border-color: rgba(200, 200, 200, 0.8);
-    background: rgba(80, 80, 80, 0.6);
+.inventory-slot:not(.occupied) {
+    border-style: dashed;
+    opacity: 0.6;
 }
 
-.inventory-slot.occupied {
-    border-color: rgba(150, 150, 150, 0.7);
-    background: rgba(70, 70, 70, 0.6);
+.inventory-slot:not(.occupied):hover {
+    border-color: rgba(150, 150, 150, 0.6);
+    background: rgba(50, 50, 50, 0.5);
+    opacity: 0.8;
 }
 
 .inventory-slot.occupied:hover {
