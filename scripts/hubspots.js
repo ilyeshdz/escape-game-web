@@ -1,5 +1,5 @@
 import { getStateMachine } from './stateMachine.js';
-import { loadHubspotsData, getHubspotsData as getHubspotsDataFromFile } from './hubspotsData.js';
+import { loadHubspotsData } from './hubspotsData.js';
 import { setFlag, unsetFlag, checkCondition } from './flags.js';
 import { addItem, removeItem, getSelectedItemObject } from './inventory.js';
 import { checkInventoryCondition } from './inventory.js';

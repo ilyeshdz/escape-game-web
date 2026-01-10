@@ -128,6 +128,27 @@ function renderHubspots() {
 
         if (hubspot.isHidden) return;
 
+        if (hubspot.emoji) {
+            ctx.font = `${size * 0.6}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'white';
+            ctx.fillText(hubspot.emoji, x, y);
+
+            if (isHovered) {
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+                ctx.stroke();
+
+                if (hubspot.tooltip) {
+                    renderTooltip(x, y, hubspot.tooltip);
+                }
+            }
+            return;
+        }
+
         ctx.beginPath();
         ctx.arc(x, y, size / 2, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';

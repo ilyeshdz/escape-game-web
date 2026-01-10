@@ -40,24 +40,3 @@ export function checkCondition(condition) {
     if (condition.requireNotFlags && !hasNoneOfFlags(condition.requireNotFlags)) return false;
     return true;
 }
-
-export function getFlags() {
-    return { ...flags };
-}
-
-export function resetFlags(defaultFlags = {}) {
-    flags = { ...defaultFlags };
-}
-
-export function debugFlags() {
-    console.log('=== FLAGS DEBUG ===');
-    const flagList = Object.entries(flags);
-    if (flagList.length === 0) {
-        console.log('No flags set');
-    } else {
-        flagList.forEach(([name, value]) => {
-            console.log(`  ${name}: ${value}`);
-        });
-    }
-    console.log('==================');
-}
