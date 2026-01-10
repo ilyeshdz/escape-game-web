@@ -3,7 +3,6 @@ import { setupHubspots, initSecretInput, getHubspots } from './hubspots.js';
 import { setupResizeHandler } from './resizeHandler.js';
 import { initInventory } from './inventory.js';
 import { initFlags } from './flags.js';
-import { initUI } from './ui.js';
 import { initCanvasScene } from './canvasScene.js';
 
 async function init() {
@@ -11,7 +10,6 @@ async function init() {
         await loadStateMachine();
         initInventory();
         initFlags();
-        initUI();
         initSecretInput();
         await setupHubspots();
         setupResizeHandler();
