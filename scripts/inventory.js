@@ -72,17 +72,9 @@ export function getItem(itemId) {
     return inventory.find(item => item.id === itemId) || null;
 }
 
-export function getInventory() {
-    return [...inventory];
-}
-
 export function selectItem(itemId) {
     selectedItem = itemId;
     updateInventoryUI();
-}
-
-export function getSelectedItem() {
-    return selectedItem;
 }
 
 export function getSelectedItemObject() {
@@ -183,11 +175,4 @@ export function hideInspectModal() {
     if (modal) {
         modal.classList.remove('active');
     }
-}
-
-export function debugInventory() {
-    console.log('=== INVENTORY DEBUG ===');
-    console.log(inventory.length > 0 ? inventory : 'Inventory is empty');
-    console.log(`Selected: ${selectedItem || 'none'}`);
-    console.log('=======================');
 }
