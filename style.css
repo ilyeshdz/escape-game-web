@@ -1,11 +1,44 @@
 /**
-* Reset CSS
-*/
+ * Reset CSS
+ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+*:focus-visible {
+    outline: 3px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px 16px;
+    z-index: 10000;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.skip-link:focus {
+    top: 0;
 }
 
 html, body {
@@ -44,6 +77,20 @@ body {
     background-color: rgba(0, 0, 0, 0.7);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
+    padding-bottom: clamp(70px, 12vw, 100px);
+}
+
+.game-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: clamp(70px, 12vw, 100px);
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
+    pointer-events: none;
+    border-radius: 0 0 8px 8px;
+}
     
     /* Pour les écrans larges (PC) */
     @media (min-aspect-ratio: 16/9) {
@@ -67,6 +114,11 @@ body {
     display: block;
     width: 100%;
     height: 100%;
+    outline: none;
+}
+
+#game-canvas.keyboard-mode {
+    cursor: default;
 }
 
 .modal {
@@ -180,6 +232,7 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease;
+    padding: 20px;
 }
 
 .finish.active {
@@ -192,6 +245,7 @@ body {
     color: white;
     transform: scale(0.9);
     transition: transform 0.3s ease;
+    max-width: 90%;
 }
 
 .finish.active .finish-content {
@@ -199,11 +253,11 @@ body {
 }
 
 .finish-content h2 {
-    font-size: 64px;
+    font-size: clamp(32px, 8vw, 64px);
     font-weight: bold;
-    margin: 0 0 30px 0;
+    margin: 0 0 clamp(15px, 4vw, 30px) 0;
     text-transform: uppercase;
-    letter-spacing: 4px;
+    letter-spacing: clamp(2px, 0.8vw, 4px);
     text-shadow: 0 0 20px currentColor, 0 4px 8px rgba(0, 0, 0, 0.5);
     animation: pulse 2s ease-in-out infinite;
 }
@@ -211,6 +265,12 @@ body {
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .finish-content h2 {
+        animation: none;
+    }
 }
 
 .finish.win .finish-content h2 {
@@ -224,11 +284,24 @@ body {
 }
 
 .finish-subtitle {
-    font-size: 18px;
+    font-size: clamp(14px, 3vw, 18px);
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 30px;
+    margin-bottom: clamp(20px, 5vw, 30px);
     font-family: 'Georgia', serif;
     font-style: italic;
+    line-height: 1.5;
+}
+
+#restart-btn {
+    font-size: clamp(14px, 3vw, 16px);
+    padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 24px);
+    min-height: 44px;
+}
+
+@media (max-width: 400px) {
+    .finish-content {
+        padding: 20px 10px;
+    }
 }
 
 .secret-paper {
@@ -302,26 +375,28 @@ body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
+    width: calc(100% - 40px);
+    max-width: 600px;
 }
 
 .inventory-slots {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    gap: 6px;
-    padding: 8px;
+    gap: clamp(4px, 1vw, 8px);
+    padding: clamp(6px, 1.5vw, 10px);
     background: rgba(0, 0, 0, 0.85);
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
+    border: clamp(1px, 0.3vw, 3px) solid rgba(255, 255, 255, 0.3);
+    border-radius: clamp(4px, 1vw, 8px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .inventory-slot {
-    width: 60px;
-    height: 60px;
-    min-width: 60px;
-    min-height: 60px;
+    aspect-ratio: 1;
+    width: 100%;
+    max-width: clamp(36px, 6vw, 60px);
+    min-width: 36px;
     border: 2px solid rgba(80, 80, 80, 0.5);
-    border-radius: 6px;
+    border-radius: clamp(4px, 1vw, 6px);
     background: rgba(30, 30, 30, 0.4);
     cursor: pointer;
     display: flex;
@@ -353,60 +428,271 @@ body {
     box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
 }
 
+.inventory-slot:focus-visible {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
 .slot-icon {
-    width: 45px;
-    height: 45px;
+    width: 70%;
+    height: 70%;
     object-fit: contain;
 }
 
 .slot-text {
     color: rgba(255, 255, 255, 0.9);
-    font-size: 16px;
+    font-size: clamp(10px, 2.5vw, 16px);
     font-weight: bold;
     text-transform: uppercase;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .slot-emoji {
-    font-size: 32px;
+    font-size: clamp(20px, 4vw, 32px);
     line-height: 1;
     filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 .slot-number {
     position: absolute;
-    top: 2px;
-    left: 5px;
-    font-size: 10px;
+    top: clamp(1px, 0.3vw, 2px);
+    left: clamp(3px, 0.8vw, 5px);
+    font-size: clamp(8px, 1.5vw, 10px);
     color: rgba(255, 255, 255, 0.5);
     font-weight: bold;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 
-.inspect-paper {
-    max-width: 500px;
+/* Small screens - reduce to 5 slots visible, scroll */
+@media (max-width: 500px) {
+    .inventory-hotbar {
+        bottom: 10px;
+        width: calc(100% - 20px);
+    }
+
+    .inventory-slots {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        padding: 6px;
+    }
+
+    .inventory-slot {
+        max-width: clamp(40px, 15vw, 60px);
+        min-width: 40px;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 350px) {
+    .inventory-slots {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .inventory-slot {
+        max-width: clamp(35px, 18vw, 50px);
+        min-width: 35px;
+    }
+}
+
+/* Toggle help button */
+.toggle-help {
+    position: fixed;
+    bottom: clamp(75px, 13vw, 110px);
+    right: clamp(10px, 3vw, 20px);
+    width: clamp(40px, 8vw, 48px);
+    height: clamp(40px, 8vw, 48px);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: clamp(16px, 4vw, 20px);
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.toggle-help:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.toggle-help:focus-visible {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+/* Keyboard help panel */
+.keyboard-help {
+    position: fixed;
+    bottom: clamp(125px, 20vw, 175px);
+    right: clamp(10px, 3vw, 20px);
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: clamp(4px, 1vw, 8px);
+    padding: clamp(10px, 2vw, 16px);
+    color: white;
+    font-size: clamp(11px, 2vw, 13px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.5vw, 10px);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    min-width: clamp(130px, 30vw, 160px);
+}
+
+.keyboard-help:not([hidden]) {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.keyboard-help span {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1.5vw, 10px);
+}
+
+.keyboard-help kbd {
+    background: rgba(255, 255, 255, 0.15);
+    padding: clamp(2px, 0.5vw, 4px) clamp(6px, 1.5vw, 8px);
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: clamp(10px, 2vw, 12px);
+    min-width: clamp(55px, 15vw, 70px);
     text-align: center;
 }
 
-.inspect-item-icon {
-    width: 150px;
-    height: 150px;
-    object-fit: contain;
-    margin: 0 auto 20px;
-    border: 2px solid #d4a574;
-    border-radius: 8px;
-    display: none;
+@media (prefers-reduced-motion: reduce) {
+    .keyboard-help {
+        display: none;
+    }
 }
 
-.inspect-item-title {
-    color: #333;
-    margin-bottom: 15px;
-    font-size: 24px;
-    font-family: 'Georgia', serif;
+@media (max-width: 500px) {
+    .toggle-help {
+        bottom: 80px;
+        right: 10px;
+    }
+
+    .keyboard-help {
+        bottom: 130px;
+        right: 10px;
+    }
 }
 
-.inspect-item-description {
-    color: #555;
-    line-height: 1.6;
+@media (max-width: 350px) {
+    .toggle-help {
+        bottom: 75px;
+        right: 8px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .keyboard-help {
+        bottom: 120px;
+        right: 8px;
+        padding: 10px;
+        min-width: 130px;
+    }
+}
+
+/* Landscape warning popup */
+.landscape-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.landscape-warning:not([hidden]) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.landscape-warning-content {
+    text-align: center;
+    color: white;
+    max-width: 280px;
+}
+
+.landscape-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 20px;
+    animation: rotate-device 2s ease-in-out infinite;
+}
+
+@keyframes rotate-device {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.landscape-warning-content p {
     font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.landscape-dismiss {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: background 0.2s;
+}
+
+.landscape-dismiss:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.landscape-dismiss:focus-visible {
+    outline: 3px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+/* Show only on small screens in landscape */
+@media (min-aspect-ratio: 1/1) and (max-width: 600px) {
+    .landscape-warning:not([hidden]) {
+        display: flex;
+    }
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .landscape-warning:not([hidden]) {
+        display: none;
+    }
+}
+
+@media (min-width: 601px) {
+    .landscape-warning {
+        display: none !important;
+    }
+}
+
 }
