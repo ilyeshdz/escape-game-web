@@ -172,7 +172,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -190,20 +190,45 @@ body {
 .finish-content {
     text-align: center;
     color: white;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.finish.active .finish-content {
+    transform: scale(1);
 }
 
 .finish-content h2 {
-    font-size: 48px;
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 64px;
+    font-weight: bold;
+    margin: 0 0 30px 0;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px currentColor, 0 4px 8px rgba(0, 0, 0, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 .finish.win .finish-content h2 {
     color: #4CAF50;
+    text-shadow: 0 0 30px rgba(76, 175, 80, 0.6), 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .finish.lose .finish-content h2 {
     color: #f44336;
+    text-shadow: 0 0 30px rgba(244, 67, 54, 0.6), 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.finish-subtitle {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 30px;
+    font-family: 'Georgia', serif;
+    font-style: italic;
 }
 
 .secret-paper {
