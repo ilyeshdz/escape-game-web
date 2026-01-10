@@ -62,15 +62,6 @@ Affiche une modale demandant un code secret.
 *   `secretCode` (string, requis): Le code secret à entrer.
 *   `onSuccess` (object, optionnel): Un objet qui définit ce qui se passe lorsque le code est correct. Peut contenir les mêmes propriétés qu'un hubspot (`type`, `action`, `modalText`, `win`).
 
-### `pickup`
-
-Permet au joueur de ramasser un objet.
-
-**Propriétés supplémentaires:**
-
-*   `item` (object, requis): L'objet à ramasser. Voir la documentation sur l'inventaire pour le format de l'objet.
-*   `requireMessage` (string, optionnel): Un message à afficher si le joueur n'a pas les objets requis pour ramasser cet objet.
-
 ### `useItem`
 
 Permet au joueur d'utiliser un objet sur le hubspot.
