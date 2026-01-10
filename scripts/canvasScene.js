@@ -3,6 +3,8 @@ let ctx = null;
 let sceneImage = null;
 let hubspots = [];
 let hoveredHubspotId = null;
+let focusedHubspotIndex = -1;
+let isKeyboardNavigating = false;
 
 export function initCanvasScene(canvasElement, imagePath, hubspotsData) {
     canvas = canvasElement;
@@ -71,10 +73,13 @@ function setupEventListeners() {
         
         hoveredHubspotId = getHubspotAtPosition(x, y);
         
-        canvas.style.cursor = hoveredHubspotId ? 'pointer' : 'default';
+        if (!isKeyboardNavigating) {
+            canvas.style.cursor = hoveredHubspotId ? 'pointer' : 'default';
+        }
     });
 
     canvas.addEventListener('click', (e) => {
+        canvas.focus();
         if (hoveredHubspotId) {
             const hubspot = hubspots.find(h => h.id === hoveredHubspotId);
             if (hubspot && hubspot.onClick) {
@@ -82,6 +87,55 @@ function setupEventListeners() {
             }
         }
     });
+
+    canvas.addEventListener('keydown', handleKeyboardNavigation);
+
+    canvas.addEventListener('focus', () => {
+        isKeyboardNavigating = false;
+    });
+
+    canvas.addEventListener('mousedown', () => {
+        isKeyboardNavigating = false;
+        canvas.classList.remove('keyboard-mode');
+    });
+}
+
+function handleKeyboardNavigation(e) {
+    const visibleHubspots = hubspots.filter(h => !h.isHidden);
+    
+    if (visibleHubspots.length === 0) return;
+
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        isKeyboardNavigating = true;
+        canvas.classList.add('keyboard-mode');
+
+        if (focusedHubspotIndex < 0) {
+            focusedHubspotIndex = 0;
+        } else {
+            const direction = e.shiftKey ? -1 : 1;
+            focusedHubspotIndex = (focusedHubspotIndex + direction + visibleHubspots.length) % visibleHubspots.length;
+        }
+
+        const focusedHubspot = visibleHubspots[focusedHubspotIndex];
+        if (focusedHubspot) {
+            hoveredHubspotId = focusedHubspot.id;
+        }
+        renderHubspots();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (focusedHubspotIndex >= 0 && hoveredHubspotId) {
+            const hubspot = hubspots.find(h => h.id === hoveredHubspotId);
+            if (hubspot && hubspot.onClick) {
+                hubspot.onClick(hubspot);
+            }
+        }
+    } else if (e.key === 'Escape') {
+        isKeyboardNavigating = false;
+        focusedHubspotIndex = -1;
+        canvas.classList.remove('keyboard-mode');
+        renderHubspots();
+    }
 }
 
 function getHubspotAtPosition(x, y) {
@@ -90,7 +144,7 @@ function getHubspotAtPosition(x, y) {
     for (const hubspot of hubspots) {
         const hubspotX = (hubspot.x / 100) * canvas.renderWidth + canvas.offsetX;
         const hubspotY = (hubspot.y / 100) * canvas.renderHeight + canvas.offsetY;
-        const size = (hubspot.size || 40);
+        const size = getHubspotSize(hubspot);
 
         const dx = x - hubspotX;
         const dy = y - hubspotY;
@@ -102,6 +156,21 @@ function getHubspotAtPosition(x, y) {
     }
 
     return null;
+}
+
+function getHubspotSize(hubspot) {
+    if (hubspot.size) return hubspot.size;
+
+    const baseSize = 40;
+    const minDimension = Math.min(canvas.renderWidth, canvas.renderHeight);
+    const scaleFactor = minDimension / 1000;
+
+    return Math.round(baseSize * Math.max(0.4, Math.min(1.5, scaleFactor)));
+}
+
+function getEmojiSize(hubspot) {
+    const size = getHubspotSize(hubspot);
+    return Math.max(12, Math.round(size * 0.5));
 }
 
 function renderLoop() {
@@ -126,13 +195,14 @@ function renderHubspots() {
     hubspots.forEach(hubspot => {
         const x = (hubspot.x / 100) * canvas.renderWidth + canvas.offsetX;
         const y = (hubspot.y / 100) * canvas.renderHeight + canvas.offsetY;
-        const size = hubspot.size || 40;
+        const size = getHubspotSize(hubspot);
         const isHovered = hoveredHubspotId === hubspot.id;
 
         if (hubspot.isHidden) return;
 
         if (hubspot.emoji) {
-            ctx.font = `${size * 0.6}px Arial, sans-serif`;
+            const emojiSize = getEmojiSize(hubspot);
+            ctx.font = `${emojiSize}px Arial, sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = 'white';
@@ -140,13 +210,13 @@ function renderHubspots() {
 
             if (isHovered) {
                 ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
+                ctx.lineWidth = Math.max(1, size / 25);
                 ctx.beginPath();
                 ctx.arc(x, y, size / 2, 0, Math.PI * 2);
                 ctx.stroke();
 
                 if (hubspot.tooltip) {
-                    renderTooltip(x, y, hubspot.tooltip);
+                    renderTooltip(x, y, hubspot.tooltip, size);
                 }
             }
             return;
@@ -161,35 +231,67 @@ function renderHubspots() {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.fill();
             ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = Math.max(1.5, size / 20);
             ctx.stroke();
             
             if (hubspot.tooltip) {
-                renderTooltip(x, y, hubspot.tooltip);
+                renderTooltip(x, y, hubspot.tooltip, size);
             }
         }
     });
+
+    if (isKeyboardNavigating && focusedHubspotIndex >= 0) {
+        const visibleHubspots = hubspots.filter(h => !h.isHidden);
+        const focusedHubspot = visibleHubspots[focusedHubspotIndex];
+        
+        if (focusedHubspot) {
+            const x = (focusedHubspot.x / 100) * canvas.renderWidth + canvas.offsetX;
+            const y = (focusedHubspot.y / 100) * canvas.renderHeight + canvas.offsetY;
+            const size = getHubspotSize(focusedHubspot);
+
+            ctx.beginPath();
+            ctx.arc(x, y, size / 2 + 2, 0, Math.PI * 2);
+            ctx.strokeStyle = '#4CAF50';
+            ctx.lineWidth = Math.max(2, size / 25);
+            ctx.setLineDash([4, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    }
 }
 
-function renderTooltip(x, y, text) {
-    ctx.font = 'bold 14px Arial, Helvetica, sans-serif';
+function renderTooltip(x, y, text, hubspotSize = 40) {
+    const fontSize = Math.max(11, Math.min(14, Math.round(hubspotSize / 3)));
+    ctx.font = `bold ${fontSize}px Arial, Helvetica, sans-serif`;
     const textMetrics = ctx.measureText(text);
-    const padding = 12;
-    const tooltipWidth = textMetrics.width + padding * 2;
-    const tooltipHeight = 28;
+    const padding = Math.max(6, Math.round(hubspotSize / 5));
+    const tooltipWidth = Math.min(textMetrics.width + padding * 2, canvas.width - 20);
+    const tooltipHeight = Math.max(20, fontSize + padding);
+
+    const margin = 5;
+
+    // Always display above the hubspot
     let tooltipX = x - tooltipWidth / 2;
-    let tooltipY = y - 40;
+    let tooltipY = y - hubspotSize / 2 - tooltipHeight - 8;
 
-    if (tooltipX < 0) tooltipX = 0;
-    if (tooltipX + tooltipWidth > canvas.width) tooltipX = canvas.width - tooltipWidth;
-    if (tooltipY < 0) tooltipY = y + 20;
+    // Adjust horizontal position if it overflows
+    if (tooltipX < margin) {
+        tooltipX = margin;
+    } else if (tooltipX + tooltipWidth > canvas.width - margin) {
+        tooltipX = canvas.width - tooltipWidth - margin;
+    }
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+    // If tooltip overflows at the top, clamp it to the top margin
+    if (tooltipY < margin) {
+        tooltipY = margin;
+    }
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
     ctx.beginPath();
-    roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 6);
+    roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 4);
     ctx.fill();
 
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
