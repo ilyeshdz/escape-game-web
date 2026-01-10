@@ -271,7 +271,7 @@ body {
     background: #d4d4b4;
 }
 
-.inventory {
+.inventory-hotbar {
     position: fixed;
     bottom: 20px;
     left: 50%;
@@ -279,120 +279,76 @@ body {
     z-index: 100;
 }
 
-.inventory-toggle {
+.inventory-slots {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.inventory-slot {
     width: 60px;
     height: 60px;
-    border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.8);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-size: 28px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease, background 0.2s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-}
-
-.inventory-toggle:hover {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.85);
-}
-
-.inventory-toggle:active {
-    transform: scale(0.95);
-}
-
-.inventory-panel {
-    position: absolute;
-    bottom: 85px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: rgba(0, 0, 0, 0.95);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    padding: 20px;
-    min-width: 420px;
-    max-width: 90vw;
-    max-height: 60vh;
-    overflow-y: auto;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-}
-
-.inventory-panel.active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateX(-50%) translateY(0);
-}
-
-.inventory-title {
-    color: white;
-    margin-bottom: 15px;
-    text-align: center;
-    font-size: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding-bottom: 10px;
-}
-
-.inventory-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+    min-width: 60px;
     min-height: 60px;
-}
-
-.inventory-item {
-    width: 70px;
-    height: 70px;
-    min-width: 70px;
-    min-height: 70px;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(100, 100, 100, 0.6);
+    border-radius: 6px;
+    background: rgba(50, 50, 50, 0.5);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     position: relative;
 }
 
-.inventory-item:hover {
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.2);
+.inventory-slot:hover {
+    border-color: rgba(200, 200, 200, 0.8);
+    background: rgba(80, 80, 80, 0.6);
 }
 
-.inventory-item.selected {
+.inventory-slot.occupied {
+    border-color: rgba(150, 150, 150, 0.7);
+    background: rgba(70, 70, 70, 0.6);
+}
+
+.inventory-slot.occupied:hover {
+    border-color: rgba(255, 255, 255, 0.9);
+    background: rgba(100, 100, 100, 0.7);
+}
+
+.inventory-slot.selected {
     border-color: #4CAF50;
-    background: rgba(76, 175, 80, 0.3);
-    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+    background: rgba(76, 175, 80, 0.25);
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
 }
 
-.inventory-item-icon {
+.slot-icon {
     width: 45px;
     height: 45px;
     object-fit: contain;
 }
 
-.inventory-item-text {
-    color: white;
-    font-size: 18px;
+.slot-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.inventory-hint {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 12px;
-    text-align: center;
-    margin-top: 15px;
-    margin-bottom: 0;
+.slot-number {
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 
 .inspect-paper {
