@@ -33,6 +33,22 @@ Pour une documentation détaillée sur chaque partie du moteur de jeu, veuillez 
 
 Pour changer l'image de fond, remplacez le fichier `assets/scene1.png` par votre propre image. Vous pouvez également modifier le nom du fichier dans `index.html` si vous le souhaitez.
 
+### Personnaliser l'apparence des hubspots
+
+Les hubspots peuvent afficher des émojis au lieu de cercles blancs. Ajoutez simplement la propriété `emoji` à un hubspot:
+
+```json
+{
+  "id": "chest",
+  "type": "modal",
+  "visibleIn": ["room1"],
+  "emoji": "📦",
+  "x": 50,
+  "y": 50,
+  "modalText": "Un coffre au trésor!"
+}
+```
+
 ## Lancer le jeu
 
 Pour jouer, ouvrez simplement le fichier `index.html` dans votre navigateur.
