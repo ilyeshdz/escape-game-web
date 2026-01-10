@@ -4,8 +4,6 @@ Ce projet a été réalisé dans le cadre de l'enseignement de spécialité **Nu
 
 L'objectif de ce projet est de mettre en pratique les bases du développement web (HTML, CSS, JavaScript) en créant un mini jeu d'évasion (escape game).
 
-> **Note :** Ce projet est en cours de refactoring sur la branche `refactor/canvas-ui` pour remplacer le rendu DOM des éléments interactifs (hubspots, scène) par l'API Canvas pour de meilleures performances.
-
 ## Philosophie du projet
 
 Au lieu de simplement créer un escape game unique, ce projet a été conçu comme un **moteur de jeu d'évasion**. L'idée est de fournir un outil qui permet de créer des escape games de manière **ultra-configurable**, rapidement et sans avoir à modifier le code source.
