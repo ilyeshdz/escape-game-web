@@ -1,12 +1,14 @@
 import { getStateMachine } from './stateMachine.js';
-import { loadHubspotsData, getHubspotsData } from './hubspotsData.js';
+import { loadHubspotsData, getHubspotsData as getHubspotsDataFromFile } from './hubspotsData.js';
 import { setFlag, unsetFlag, checkCondition } from './flags.js';
 import { addItem, removeItem, getSelectedItemObject } from './inventory.js';
 import { checkInventoryCondition } from './inventory.js';
+import { updateHubspots as updateCanvasHubspots } from './canvasScene.js';
 
-let hubspotElements = [];
 let hubspotsData = [];
-let hubspotCleanupFunctions = [];
+let activeHubspots = [];
+let currentSecretHubspotData = null;
+const autoShownHubspots = new Set();
 
 const hubspotHandlers = {
     area: handleAreaAction,
@@ -18,54 +20,6 @@ const hubspotHandlers = {
     pickup: handlePickup,
     useItem: handleUseItem,
 };
-
-function createHubspot(hubspotData, container, template) {
-    const hubspotElement = template.content.cloneNode(true);
-    const hubspot = hubspotElement.querySelector('.hubspot');
-    const tooltip = hubspotElement.querySelector('.hubspot-tooltip');
-
-    if (!hubspot || !tooltip) {
-        console.error('[Hubspots] Template is missing required elements');
-        return null;
-    }
-
-    const clickHandler = (e) => {
-        e.stopPropagation();
-        const type = hubspotData.type || 'action';
-        console.log(`[Hubspot] Clicked: ${hubspotData.id} (type: ${type}, state: ${getStateMachine().getState()})`);
-
-        const handler = hubspotHandlers[type];
-        if (handler) {
-            handler(hubspotData);
-        }
-    };
-
-    hubspot.addEventListener('click', clickHandler);
-    hubspotCleanupFunctions.push({ element: hubspot, handler: clickHandler });
-
-    if (hubspotData.type === 'area') {
-        hubspot.classList.add('hubspot-area');
-        hubspot.style.width = `${hubspotData.size || 200}px`;
-        hubspot.style.height = `${hubspotData.size || 200}px`;
-        if (hubspotData.isHidden) {
-            hubspot.style.opacity = '0';
-        }
-    }
-
-    hubspot.dataset.xPercent = hubspotData.x;
-    hubspot.dataset.yPercent = hubspotData.y;
-    hubspot.dataset.id = hubspotData.id;
-    hubspot.dataset.type = hubspotData.type;
-    if (hubspotData.action) {
-        hubspot.dataset.action = hubspotData.action;
-    }
-    if (hubspotData.tooltip) {
-        tooltip.textContent = hubspotData.tooltip;
-    }
-
-    container.appendChild(hubspotElement);
-    return hubspot;
-}
 
 function executeHubspotActions(hubspotData) {
     if (hubspotData.giveItems) {
@@ -174,62 +128,48 @@ export async function setupHubspots() {
     updateHubspotsVisibility();
 }
 
+export function getHubspots() {
+    return activeHubspots;
+}
+
 function updateHubspotsVisibility() {
-    const hubspotsContainer = document.getElementById('hubspots');
-    const template = document.getElementById('hubspot-template');
     const currentState = getStateMachine().getState();
 
-    if (!hubspotsContainer || !template) {
-        console.error('[Hubspots] Cannot update visibility: container or template missing');
-        return;
-    }
+    activeHubspots = hubspotsData
+        .map(hubspotData => {
+            const isVisibleInState = hubspotData.visibleIn.includes(currentState);
+            const meetsConditions = checkCondition({
+                requireFlags: hubspotData.requireFlags,
+                requireAnyFlags: hubspotData.requireAnyFlags,
+                requireNotFlags: hubspotData.requireNotFlags
+            }) && checkInventoryCondition({
+                requireItems: hubspotData.requireItems,
+                requireAnyItems: hubspotData.requireAnyItems,
+                requireNotItems: hubspotData.requireNotItems
+            });
 
-    const hubspotDataById = new Map(hubspotsData.map(h => [h.id, h]));
-    const activeHubspotIds = new Set();
-
-    hubspotsData.forEach(hubspotData => {
-        const isVisibleInState = hubspotData.visibleIn.includes(currentState);
-        const meetsConditions = checkCondition({
-            requireFlags: hubspotData.requireFlags,
-            requireAnyFlags: hubspotData.requireAnyFlags,
-            requireNotFlags: hubspotData.requireNotFlags
-        }) && checkInventoryCondition({
-            requireItems: hubspotData.requireItems,
-            requireAnyItems: hubspotData.requireAnyItems,
-            requireNotItems: hubspotData.requireNotItems
-        });
-
-        if (isVisibleInState && meetsConditions) {
-            activeHubspotIds.add(hubspotData.id);
-        }
-    });
-
-    hubspotElements = hubspotElements.filter(el => {
-        const hubspotId = el.dataset.id;
-        if (activeHubspotIds.has(hubspotId)) {
-            return true; 
-        } else {
-            const cleanup = hubspotCleanupFunctions.find(c => c.element === el);
-            if (cleanup) {
-                el.removeEventListener('click', cleanup.handler);
-                hubspotCleanupFunctions = hubspotCleanupFunctions.filter(c => c.element !== el);
+            if (isVisibleInState && meetsConditions) {
+                return {
+                    ...hubspotData,
+                    onClick: (hubspot) => {
+                        const type = hubspot.type || 'action';
+                        const handler = hubspotHandlers[type];
+                        if (handler) {
+                            handler(hubspot);
+                        }
+                    }
+                };
             }
-            el.remove();
-            return false;
-        }
-    });
+            return null;
+        })
+        .filter(h => h !== null);
 
-    activeHubspotIds.forEach(hubspotId => {
-        const exists = hubspotElements.some(el => el.dataset.id === hubspotId);
-        if (!exists) {
-            const hubspotData = hubspotDataById.get(hubspotId);
-            const element = createHubspot(hubspotData, hubspotsContainer, template);
-            if (element) {
-                hubspotElements.push(element);
-                if (hubspotData.autoShow && hubspotData.type === 'modal' && hubspotData.modalText) {
-                    setTimeout(() => showModal(hubspotData.modalText), 100);
-                }
-            }
+    updateCanvasHubspots(activeHubspots);
+
+    activeHubspots.forEach(hubspotData => {
+        if (hubspotData.autoShow && hubspotData.type === 'modal' && hubspotData.modalText && !autoShownHubspots.has(hubspotData.id)) {
+            autoShownHubspots.add(hubspotData.id);
+            setTimeout(() => showModal(hubspotData.modalText), 100);
         }
     });
 }
@@ -269,7 +209,6 @@ const secretPrompt = document.getElementById('secret-prompt');
 const secretError = document.getElementById('secret-error');
 const secretSubmit = document.getElementById('secret-submit');
 const secretCancel = document.getElementById('secret-cancel');
-let currentSecretHubspotData = null;
 
 function checkSecret() {
     if (!currentSecretHubspotData) return;
@@ -315,9 +254,23 @@ function checkSecret() {
 }
 
 export function initSecretInput() {
+    const secretClose = document.getElementById('secret-close');
+    const inspectClose = document.getElementById('inspect-close');
+    
     secretSubmit.addEventListener('click', checkSecret);
     secretCancel.addEventListener('click', () => secretModal.classList.remove('active'));
     secretInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkSecret());
+    
+    if (secretClose) {
+        secretClose.addEventListener('click', () => secretModal.classList.remove('active'));
+    }
+    
+    if (inspectClose) {
+        inspectClose.addEventListener('click', () => {
+            const modal = document.getElementById('item-inspect-modal');
+            if (modal) modal.classList.remove('active');
+        });
+    }
 }
 
 function showSecretInput(hubspotData) {
