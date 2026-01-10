@@ -37,7 +37,6 @@
     "y": 80,
     "type": "modal",
     "visibleIn": ["safeOpen"],
-    "autoShow": true,
     "tooltip": "",
     "modalText": "<strong>Le coffre s'ouvre!</strong><br><br>À l'intérieur, vous trouvez une clé dorée.",
     "giveItems": [
@@ -57,7 +56,7 @@
     "y": 40,
     "type": "modal",
     "size": 150,
-    "visibleIn": ["room1", "safeOpen"],
+    "visibleIn": ["room1"],
     "tooltip": "Porte verrouillée",
     "modalText": "La porte est verrouillée. Vous avez besoin de la clé dorée pour l'ouvrir.",
     "requireNotItems": ["goldenKey"]
@@ -65,7 +64,7 @@
   {
     "id": "doorUnlocked",
     "x": 80,
-    "y": 50,
+    "y": 65,
     "type": "useItem",
     "size": 150,
     "visibleIn": ["room1", "safeOpen"],

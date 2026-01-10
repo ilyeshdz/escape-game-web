@@ -8,16 +8,8 @@
 </head>
 <body>
     <div class="game-container">
-        <img id="scene" src="./assets/scene1.png">
-        <div id="hubspots">
-
-        </div>
+        <canvas id="game-canvas"></canvas>
     </div>
-    <template id="hubspot-template">
-        <div class="hubspot">
-            <div class="hubspot-tooltip"></div>
-        </div>
-    </template>
     <div id="modal" class="modal" onclick="if(event.target === this) window.closeModal()">
         <div class="modal-paper">
             <button class="modal-close" onclick="window.closeModal()">×</button>
@@ -29,9 +21,9 @@
             <h2 id="finish-message"></h2>
         </div>
     </div>
-    <div id="secret-modal" class="modal" onclick="if(event.target === this) window.closeSecretModal()">
+    <div id="secret-modal" class="modal">
         <div class="modal-paper secret-paper">
-            <button class="modal-close" onclick="window.closeSecretModal()">×</button>
+            <button class="modal-close" id="secret-close">×</button>
             <div id="secret-prompt" class="secret-prompt"></div>
             <input type="text" id="secret-input" class="secret-input" placeholder="Code secret">
             <div id="secret-error" class="secret-error"></div>
@@ -41,9 +33,9 @@
             </div>
         </div>
     </div>
-    <div id="item-inspect-modal" class="modal" onclick="if(event.target === this) window.closeInspectModal()">
+    <div id="item-inspect-modal" class="modal">
         <div class="modal-paper inspect-paper">
-            <button class="modal-close" onclick="window.closeInspectModal()">×</button>
+            <button class="modal-close" id="inspect-close">×</button>
             <img id="inspect-item-icon" class="inspect-item-icon" src="" alt="">
             <h3 id="inspect-item-title" class="inspect-item-title"></h3>
             <p id="inspect-item-description" class="inspect-item-description"></p>
