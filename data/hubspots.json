@@ -5,6 +5,7 @@
     "y": 30,
     "type": "modal",
     "visibleIn": ["room1", "safeOpen", "finished"],
+    "emoji": "🖼️",
     "tooltip": "Peinture mystérieuse",
     "modalText": "Vous remarquez un curieux tableau représentant un coffre avec les chiffres 1-2-3-4 peints en rouge."
   },
@@ -14,6 +15,7 @@
     "y": 60,
     "type": "secret",
     "visibleIn": ["room1"],
+    "emoji": "🔐",
     "tooltip": "Coffre-fort",
     "prompt": "Entrez le code du coffre-fort:",
     "secretCode": "1234",
@@ -23,20 +25,13 @@
     }
   },
   {
-    "id": "safeOpened",
-    "x": 50,
-    "y": 50,
-    "type": "modal",
-    "visibleIn": ["safeOpen", "finished"],
-    "tooltip": "Coffre-fort ouvert",
-    "modalText": "Le coffre-fort est déjà ouvert."
-  },
-  {
     "id": "testItems",
     "x": 10,
     "y": 80,
+    "size": 50,
     "type": "modal",
     "visibleIn": ["room1", "safeOpen"],
+    "emoji": "📦",
     "tooltip": "Coffre au trésor",
     "modalText": "Vous trouvez un coffre au trésor avec plusieurs objets à l'intérieur!",
     "giveItems": [
@@ -70,10 +65,14 @@
     "id": "safeSuccess",
     "x": 80,
     "y": 80,
+    "size": 50,
     "type": "modal",
     "visibleIn": ["safeOpen"],
-    "tooltip": "",
+    "emoji": "🔓",
+    "tooltip": "Coffre-fort ouvert",
     "modalText": "<strong>Le coffre s'ouvre!</strong><br><br>À l'intérieur, vous trouvez une clé dorée.",
+    "requireNotItems": ["goldenKey"],
+    "requireNotFlags": ["keyUsed"],
     "giveItems": [
       {
         "id": "goldenKey",
@@ -92,6 +91,7 @@
     "type": "modal",
     "size": 150,
     "visibleIn": ["room1"],
+    "emoji": "🔒",
     "tooltip": "Porte verrouillée",
     "modalText": "La porte est verrouillée. Vous avez besoin de la clé dorée pour l'ouvrir.",
     "requireNotItems": ["goldenKey"]
@@ -104,11 +104,12 @@
     "size": 150,
     "visibleIn": ["room1", "safeOpen"],
     "requireItems": ["goldenKey"],
+    "emoji": "🚪",
     "tooltip": "Porte",
     "noItemMessage": "La porte est verrouillée. Sélectionnez la clé dorée dans l'inventaire, puis cliquez sur la porte.",
     "wrongItemMessage": "Cet objet ne sert à rien ici.",
     "action": "unlockDoor",
-    "giveFlags": ["doorUnlocked"]
+    "giveFlags": ["doorUnlocked", "keyUsed"]
   },
   {
     "id": "doorExit",
@@ -118,6 +119,7 @@
     "size": 150,
     "visibleIn": ["room1", "safeOpen"],
     "requireFlags": ["doorUnlocked"],
+    "emoji": "🚪",
     "tooltip": "Sortir",
     "action": "escape",
     "win": true
