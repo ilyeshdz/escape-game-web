@@ -4,12 +4,33 @@
 let inventory = [];
 let selectedItem = null;
 const INVENTORY_SIZE = 9;
+const STORAGE_KEY = 'escapeGame_inventory';
 
 export function initInventory() {
-    inventory = [];
-    selectedItem = null;
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            inventory = data.inventory || [];
+            selectedItem = data.selectedItem || null;
+        } catch (e) {
+            inventory = [];
+            selectedItem = null;
+        }
+    } else {
+        inventory = [];
+        selectedItem = null;
+    }
     setupInventoryShortcuts();
     updateInventoryUI();
+}
+
+function saveInventory() {
+    const data = {
+        inventory: inventory,
+        selectedItem: selectedItem
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
 function setupInventoryShortcuts() {
@@ -35,6 +56,7 @@ export function addItem(item) {
         return false;
     }
     inventory.push(item);
+    saveInventory();
     updateInventoryUI();
     return true;
 }
@@ -46,6 +68,7 @@ export function removeItem(itemId) {
         if (selectedItem === itemId) {
             selectedItem = null;
         }
+        saveInventory();
         updateInventoryUI();
         return true;
     }
@@ -74,6 +97,7 @@ export function getItem(itemId) {
 
 export function selectItem(itemId) {
     selectedItem = itemId;
+    saveInventory();
     updateInventoryUI();
 }
 
@@ -175,4 +199,11 @@ export function hideInspectModal() {
     if (modal) {
         modal.classList.remove('active');
     }
+}
+
+export function clearInventory() {
+    inventory = [];
+    selectedItem = null;
+    localStorage.removeItem(STORAGE_KEY);
+    updateInventoryUI();
 }
