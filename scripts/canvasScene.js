@@ -19,6 +19,9 @@ function loadSceneImage(path) {
     sceneImage.onload = () => {
         resizeCanvas();
     };
+    sceneImage.onerror = () => {
+        console.error('[CanvasScene] Failed to load scene image:', path);
+    };
     sceneImage.src = path;
 }
 
@@ -174,8 +177,12 @@ function renderTooltip(x, y, text) {
     const padding = 12;
     const tooltipWidth = textMetrics.width + padding * 2;
     const tooltipHeight = 28;
-    const tooltipX = x - tooltipWidth / 2;
-    const tooltipY = y - 40;
+    let tooltipX = x - tooltipWidth / 2;
+    let tooltipY = y - 40;
+
+    if (tooltipX < 0) tooltipX = 0;
+    if (tooltipX + tooltipWidth > canvas.width) tooltipX = canvas.width - tooltipWidth;
+    if (tooltipY < 0) tooltipY = y + 20;
 
     ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
     ctx.beginPath();
@@ -189,7 +196,7 @@ function renderTooltip(x, y, text) {
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, x, tooltipY + tooltipHeight / 2);
+    ctx.fillText(text, tooltipX + tooltipWidth / 2, tooltipY + tooltipHeight / 2);
 }
 
 function roundRect(x, y, width, height, radius) {
