@@ -13,13 +13,25 @@ jobs:
 
             - name: Update package.json version
               run: |
-                  VERSION=${TAG#v}
-                  npm pkg set version=$VERSION
+                  # Get tag name (e.g. refs/tags/v1.2.3 -> v1.2.3)
+                  TAG_REF=${GITHUB_REF#refs/tags/}
+                  # Remove leading "v" if present => 1.2.3
+                  VERSION=${TAG_REF#v}
+                  echo "Tag: $TAG_REF  Version: $VERSION"
+
+                  # Set package.json version (quote the value)
+                  npm pkg set version="$VERSION"
+
+                  # Configure git user and only commit if package.json changed
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
                   git add package.json
-                  git commit -m "chore: bump version to $VERSION"
-                  git push
+                  if git diff --staged --quiet; then
+                      echo "No package.json changes to commit"
+                  else
+                      git commit -m "chore: bump version to $VERSION"
+                      git push
+                  fi
 
             - name: Create Release
               uses: softprops/action-gh-release@v2
