@@ -1,29 +1,126 @@
-# Escape Game - Projet NSI
+# Escape Game Engine
 
-Ce projet a été réalisé dans le cadre de l'enseignement de spécialité **Numérique et Sciences Informatiques (NSI)** en classe de Première au **Lycée Lavoisier**.
+A configurable escape game engine built with vanilla HTML, CSS, and JavaScript. Create immersive escape room experiences without writing code - just configure JSON files!
 
-L'objectif de ce projet est de mettre en pratique les bases du développement web (HTML, CSS, JavaScript) en créant un mini jeu d'évasion (escape game).
+## Features
 
-## Philosophie du projet
+- **Zero-code customization**: Configure entire games using JSON files
+- **State machine architecture**: Robust game progression system
+- **Interactive hubspots**: Multiple interaction types (modals, actions, items, secrets)
+- **Inventory system**: Collect and use items throughout the game
+- **Flag system**: Track player progress and unlock content dynamically
+- **Responsive design**: Works on desktop and mobile devices
+- **Persistence**: Game state automatically saves to localStorage
 
-Au lieu de simplement créer un escape game unique, ce projet a été conçu comme un **moteur de jeu d'évasion**. L'idée est de fournir un outil qui permet de créer des escape games de manière **ultra-configurable**, rapidement et sans avoir à modifier le code source.
+## Quick Start
 
-Cette approche présente plusieurs avantages :
+### Prerequisites
 
-- **Maintenabilité :** Il est plus facile de corriger les bugs et d'ajouter des fonctionnalités au moteur de jeu, qui seront ensuite disponibles pour tous les jeux créés avec.
-- **Lisibilité et Simplicité :** La logique du jeu est entièrement définie dans des fichiers de configuration JSON, ce qui la rend plus facile à lire et à comprendre pour des non-développeurs.
-- **Rapidité de création :** Une fois le moteur en place, la création de nouveaux scénarios, énigmes et interactions se fait très rapidement en modifiant simplement les fichiers JSON.
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [pnpm](https://pnpm.io/) (recommended) or npm
 
-Le principal défi de cette approche est de concevoir un moteur suffisamment générique pour gérer tous les cas de figure possibles et imaginables dans un escape game.
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/ilyeshdz/escape-game-web.git
+cd escape-game-web
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+```
+
+Open `http://localhost:3000` in your browser to play.
+
+## Project Philosophy
+
+Instead of creating a single escape game, this project is designed as an **escape game engine**. The goal is to provide a tool that allows creating escape games in a **highly configurable**, fast way without modifying source code.
+
+This approach offers several advantages:
+
+- **Maintainability**: Easier to fix bugs and add features to the game engine
+- **Readability**: Game logic is entirely defined in JSON configuration files
+- **Speed**: Once the engine is set up, creating new scenarios is quick and easy
 
 ## Documentation
 
-Pour un guide détaillé sur la façon de personnaliser le jeu, veuillez consulter notre [documentation](./docs/getting-started.md).
+For detailed guides on customizing the game, check out:
 
-## Comment jouer
+- [Getting Started](./docs/getting-started.md) - Overview and initial setup
+- [State Machine](./docs/statemachine.md) - Understanding game states and transitions
+- [Hubspots](./docs/hubspots.md) - Creating interactive elements
+- [Inventory](./docs/inventory.md) - Managing collectible items
+- [Flags](./docs/flags.md) - Tracking player progress
 
-Ouvrez le fichier `index.html` dans votre navigateur web.
+## Customization Guide
 
-## Licence
+### Changing the Background
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus de détails.
+Replace `assets/scene1.png` with your own image. You can also modify the filename in `index.html`.
+
+### Adding Interactive Elements
+
+Hubspots are defined in `data/hubspots.json`. Here's a simple example:
+
+```json
+{
+    "id": "chest",
+    "type": "modal",
+    "visibleIn": ["room1"],
+    "emoji": "📦",
+    "x": 50,
+    "y": 50,
+    "modalText": "A treasure chest!"
+}
+```
+
+### Game Progression
+
+Define states and transitions in `data/gameConfig.json`:
+
+```json
+{
+    "initialState": "room1",
+    "transitions": {
+        "room1": {
+            "openSafe": "safeOpen"
+        },
+        "safeOpen": {
+            "unlockDoor": "finished"
+        },
+        "finished": {}
+    }
+}
+```
+
+## Available Scripts
+
+| Command             | Description               |
+| ------------------- | ------------------------- |
+| `pnpm dev`          | Start development server  |
+| `pnpm lint`         | Check code with ESLint    |
+| `pnpm lint:fix`     | Auto-fix ESLint errors    |
+| `pnpm format`       | Format code with Prettier |
+| `pnpm format:check` | Check formatting          |
+| `pnpm changelog`    | Generate changelog        |
+
+## Tech Stack
+
+- **HTML5** - Semantic markup
+- **CSS3** - Modern styling with custom properties
+- **JavaScript ES6+** - Vanilla JS with ES modules
+- **pnpm** - Package manager
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+- **Husky** - Git hooks
+
+## Contributing
+
+Interested in contributing? See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+## License
+
+MIT License. See [LICENSE](./LICENSE) for details.

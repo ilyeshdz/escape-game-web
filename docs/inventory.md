@@ -1,59 +1,69 @@
-# Inventaire
+# Inventory
 
-Le système d'inventaire permet au joueur de collecter et d'utiliser des objets. L'inventaire est affiché sous forme de hotbar de 9 emplacements en bas de l'écran.
+The inventory system allows players to collect and use items. The inventory is displayed as a hotbar with 9 slots at the bottom of the screen.
 
-## Structure d'un objet
+## Item Structure
 
-Les objets sont définis dans les hubspots via la propriété `giveItems`.
+Items are given to players through hubspots via the `giveItems` property.
 
-Voici la structure d'un objet:
+### Basic Properties
+
+| Property      | Type    | Required | Description                                   |
+| ------------- | ------- | -------- | --------------------------------------------- |
+| `id`          | string  | Yes      | Unique identifier for the item                |
+| `name`        | string  | Yes      | Item name displayed in inventory              |
+| `description` | string  | No       | Item description (shown on double-click)      |
+| `icon`        | string  | No       | Path to item icon image                       |
+| `emoji`       | string  | No       | Emoji to display as icon                      |
+| `usable`      | boolean | No       | If true, player can select and use the item   |
+| `consumable`  | boolean | No       | If true, item is removed after successful use |
+
+**Display Priority:** `icon` -> `emoji` -> First 2 letters of name
+
+**Example:**
 
 ```json
 {
     "id": "goldenKey",
-    "name": "Clé dorée",
-    "description": "Une clé qui semble importante.",
+    "name": "Golden Key",
+    "description": "An ornate key that looks important.",
     "emoji": "🔑",
     "usable": true,
     "consumable": true
 }
 ```
 
-- `id` (string, requis): Un identifiant unique pour l'objet.
-- `name` (string, requis): Le nom de l'objet qui sera affiché dans l'inventaire.
-- `description` (string, optionnel): Une description de l'objet, visible en double-cliquant dessus.
-- `icon` (string, optionnel): Le chemin vers l'icône de l'objet.
-- `emoji` (string, optionnel): Un émoji à afficher comme icône. Si non fourni, les deux premières lettres du nom seront affichées.
-- `usable` (boolean, optionnel): Si `true`, le joueur peut sélectionner l'objet pour l'utiliser.
-- `consumable` (boolean, optionnel): Si `true`, l'objet est retiré de l'inventaire après avoir été utilisé avec succès.
+## Inventory Display
 
-**Priorité d'affichage:** `icon` → `emoji` → 2 premières lettres du nom
+The inventory is displayed as a hotbar with 9 slots at the bottom of the screen.
 
-## Visuels de l'inventaire
+| State          | Visual                                   |
+| -------------- | ---------------------------------------- |
+| Empty slots    | Dashed border, reduced opacity           |
+| Occupied slots | Solid border                             |
+| Selected item  | Green border with glow effect            |
+| Numbered slots | Numbers 1-9 displayed in top-left corner |
 
-L'inventaire est affiché sous forme de hotbar de 9 emplacements en bas de l'écran.
+## Using the Inventory
 
-- **Emplacements vides**: Affichés avec une bordure en traits pointillés et une opacité réduite
-- **Emplacements occupés**: Affichés avec une bordure solide
-- **Objet sélectionné**: Bordure verte avec effet de brillance
-- **Emplacements numérotés**: Les numéros 1-9 sont affichés en haut à gauche de chaque emplacement
+| Action                     | Description                               |
+| -------------------------- | ----------------------------------------- |
+| Left click                 | Select/deselect an item                   |
+| Double-click               | Show item details                         |
+| Keys 1-9                   | Quickly select item in corresponding slot |
+| Click on "useItem" hubspot | Use selected item on the hubspot          |
 
-## Utilisation de l'inventaire
+## Inventory Conditions
 
-- **Clic gauche**: Sélectionne/désélectionne un objet
-- **Double-clic**: Affiche les détails de l'objet
-- **Touches 1-9**: Sélectionne rapidement l'objet dans l'emplacement correspondant
-- **Clic sur un hubspot "useItem"**: Utilise l'objet sélectionné sur le hubspot
+You can control hubspot visibility based on items the player possesses.
 
-## Conditions d'inventaire
+| Condition         | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| `requireItems`    | Hubspot visible only if player has **all** items    |
+| `requireAnyItems` | Hubspot visible if player has **at least one** item |
+| `requireNotItems` | Hubspot visible if player has **none** of the items |
 
-Vous pouvez contrôler la visibilité des hubspots en fonction des objets que le joueur possède.
-
-- `requireItems`: Le hubspot ne sera visible que si le joueur possède **tous** les objets de la liste.
-- `requireAnyItems`: Le hubspot ne sera visible que si le joueur possède **au moins un** des objets de la liste.
-- `requireNotItems`: Le hubspot ne sera visible que si le joueur ne possède **aucun** des objets de la liste.
-
-**Exemple:**
+**Example:**
 
 ```json
 {
@@ -61,6 +71,124 @@ Vous pouvez contrôler la visibilité des hubspots en fonction des objets que le
     "type": "modal",
     "visibleIn": ["room2"],
     "requireNotItems": ["chestKey"],
-    "modalText": "Ce coffre est verrouillé."
+    "modalText": "This chest is locked. You need a key."
 }
 ```
+
+## Complete Example
+
+Here's an example showing different item types and how to use them:
+
+### 1. Collectible Item (Non-usable)
+
+```json
+{
+    "id": "note",
+    "name": "Torn Note",
+    "description": "A piece of paper with numbers written on it.",
+    "emoji": "📜"
+}
+```
+
+### 2. Usable Item (Single-use)
+
+```json
+{
+    "id": "goldenKey",
+    "name": "Golden Key",
+    "description": "An ornate key that looks important.",
+    "emoji": "🔑",
+    "usable": true,
+    "consumable": true
+}
+```
+
+### 3. Usable Item (Multi-use)
+
+```json
+{
+    "id": "flashlight",
+    "name": "Flashlight",
+    "description": "A battery-powered flashlight.",
+    "emoji": "🔦",
+    "usable": true,
+    "consumable": false
+}
+```
+
+### 4. Item with Custom Icon
+
+```json
+{
+    "id": "map",
+    "name": "Treasure Map",
+    "description": "An old map showing the location of treasure.",
+    "icon": "/assets/icons/map.png"
+}
+```
+
+## Usage in Hubspots
+
+### Giving an Item
+
+```json
+{
+    "id": "chest",
+    "type": "modal",
+    "visibleIn": ["room1"],
+    "emoji": "📦",
+    "modalText": "You find a treasure chest!",
+    "giveItems": [
+        {
+            "id": "goldenKey",
+            "name": "Golden Key",
+            "emoji": "🔑",
+            "usable": true,
+            "consumable": true
+        }
+    ]
+}
+```
+
+### Requiring an Item
+
+```json
+{
+    "id": "door",
+    "type": "action",
+    "visibleIn": ["room1"],
+    "x": 80,
+    "y": 50,
+    "emoji": "🚪",
+    "action": "enterCorridor",
+    "requireItems": ["goldenKey"]
+}
+```
+
+### Using an Item on a Hubspot
+
+```json
+{
+    "id": "door",
+    "type": "useItem",
+    "visibleIn": ["room1"],
+    "x": 80,
+    "y": 50,
+    "emoji": "🚪",
+    "requireItems": ["goldenKey", "flashlight"],
+    "noItemMessage": "You need to select an item to use here.",
+    "wrongItemMessage": "That item doesn't work on this door.",
+    "action": "enterCorridor",
+    "giveFlags": ["doorUnlocked"]
+}
+```
+
+## Persistence
+
+The inventory automatically saves to `localStorage`, so player progress is preserved across browser sessions. This includes:
+
+- Collected items
+- Selected item
+- Item order in inventory
+
+To clear the inventory, the player can clear their browser cache or use the browser's developer tools to remove the `escape-game-web` localStorage data.
