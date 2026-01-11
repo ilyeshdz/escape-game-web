@@ -34,9 +34,17 @@ pnpm exec serve .
 ### 3. Créer une branche
 
 ```bash
-# Créez une nouvelle branche pour vos modifications
+# Assurez-vous d'être sur la branche dev
+git checkout dev
+
+# Récupérez les dernières modifications
+git pull origin dev
+
+# Créez une nouvelle branche pour vos modifications depuis dev
 git checkout -b feat/nom-de-votre-fonctionnalite
 ```
+
+> **Important** : Toute modification doit partir de la branche `dev`, jamais de `main`.
 
 ### 4. Faire des modifications
 
@@ -123,6 +131,59 @@ Les objets de l'**inventaire** peuvent avoir :
 
 Les transitions de la **machine à états** sont définies dans `data/gameConfig.json`.
 
+### Workflow de release
+
+Ce projet utilise un workflow de release structuré :
+
+#### Étape 1 : Développement (branche `dev`)
+
+- Toute nouvelle fonctionnalité, correction de bug ou amélioration est développée sur la branche `dev`
+- Les Pull Requests doivent cibler la branche `dev`
+- La branche `dev` représente toujours l'état de développement le plus récent
+
+#### Étape 2 : Préparation de la release (branche `release/x.y.z`)
+
+Quand une release est prête à être finalisée :
+
+```bash
+# Depuis dev, créez une branche de release
+git checkout dev
+git pull origin dev
+git checkout -b release/x.y.z
+```
+
+**Sur une branche de release, seuls les éléments suivants sont autorisés :**
+
+- Corrections de bugs
+- Améliorations de formatage (Prettier, ESLint)
+- Mises à jour de documentation
+- Ajustements de configuration pour la release
+
+**Interdit sur une branche de release :**
+
+- Nouvelles fonctionnalités
+- Changements structurels majeurs
+- Refactorisations importantes
+
+#### Étape 3 : Publication de la release
+
+Une fois les ajustements terminés sur la release :
+
+1. Créez une Pull Request de `release/x.y.z` vers `main`
+2. Mettez à jour le numéro de version dans les fichiers pertinents
+3. Créez un tag Git avec le numéro de version :
+    ```bash
+    git tag -a vx.y.z -m "Release version x.y.z"
+    git push origin vx.y.z
+    ```
+4. Mergez la PR dans `main`
+5. Mergez `main` dans `dev` pour synchroniser :
+    ```bash
+    git checkout dev
+    git merge main
+    git push origin dev
+    ```
+
 ### 5. Tester vos modifications
 
 1. Ouvrez `index.html` dans votre navigateur
@@ -158,7 +219,7 @@ git commit -m "style: améliorer l'apparence de l'écran de fin"
 git push origin feat/nom-de-votre-fonctionnalite
 ```
 
-Créez ensuite une Pull Request sur GitHub.
+Créez ensuite une Pull Request sur GitHub ciblant la branche **dev**.
 
 ## Conventions de code
 
@@ -250,6 +311,7 @@ Avant de soumettre une PR, vérifiez :
 - [ ] Les transitions d'état fonctionnent comme prévu
 - [ ] Les conditions de visibilité des hubspots fonctionnent
 - [ ] La documentation est mise à jour si nécessaire
+- [ ] La PR cible la branche `dev` (sauf pour les releases)
 
 ## Signaler des problèmes
 
