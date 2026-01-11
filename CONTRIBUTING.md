@@ -34,9 +34,17 @@ pnpm exec serve .
 ### 3. Créer une branche
 
 ```bash
-# Créez une nouvelle branche pour vos modifications
+# Assurez-vous d'être sur la branche dev
+git checkout dev
+
+# Récupérez les dernières modifications
+git pull origin dev
+
+# Créez une nouvelle branche pour vos modifications depuis dev
 git checkout -b feat/nom-de-votre-fonctionnalite
 ```
+
+> **Important** : Toute modification doit partir de la branche `dev`, jamais de `main`.
 
 ### 4. Faire des modifications
 
@@ -123,6 +131,384 @@ Les objets de l'**inventaire** peuvent avoir :
 
 Les transitions de la **machine à états** sont définies dans `data/gameConfig.json`.
 
+### Workflow de release
+
+Ce projet utilise un workflow structuré avec des branches dédiées pour chaque type de contribution.
+
+#### Vue d'ensemble des types de contributions
+
+| Type                    | Préfixe         | Branche Source | Branche Cible  |
+| ----------------------- | --------------- | -------------- | -------------- |
+| Nouvelle fonctionnalité | `feat/`         | `dev`          | `dev`          |
+| Correction de bug       | `fix/`          | `dev`          | `dev`          |
+| Documentation           | `docs/`         | `dev`          | `dev`          |
+| Style/formatage         | `style/`        | `dev`          | `dev`          |
+| Refactorisation         | `refactor/`     | `dev`          | `dev`          |
+| Maintenance             | `chore/`        | `dev`          | `dev`          |
+| Hotfix (production)     | `hotfix/`       | `main`         | `main` → `dev` |
+| Préparation release     | `release/x.y.z` | `dev`          | `main`         |
+
+---
+
+#### Convention de nommage des versions (Semantic Versioning)
+
+Le format est `MAJOR.MINOR.PATCH` (ex: `1.2.0`)
+
+| Composant       | Signification                                 | Quand incrémenter                                                                 |
+| --------------- | --------------------------------------------- | --------------------------------------------------------------------------------- |
+| **MAJOR** (`x`) | Breaking changes, refonte majeure             | Nouveau épisode, changement structurel affectant la compatibilité des sauvegardes |
+| **MINOR** (`y`) | Nouvelles fonctionnalités backward-compatible | Nouvelle salle, nouveau puzzle, nouveau type de hubspot                           |
+| **PATCH** (`z`) | Corrections de bugs et améliorations          | Bug fixes, perf improvements, ajustements CSS                                     |
+
+**Exemples :**
+
+- `1.0.0` → Version initiale
+- `1.1.0` → Ajout d'une nouvelle salle de puzzle
+- `1.1.1` → Correction d'un bug de persistance de l'inventaire
+- `2.0.0` → Nouvel épisode avec refonte de l'interface
+
+---
+
+#### Workflow 1 : Ajouter une nouvelle fonctionnalité
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. SYNCHRONISER                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│ git checkout dev                                                 │
+│ git pull origin dev                                              │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. CRÉER LA BRANCHE DE FEATURE                                   │
+├─────────────────────────────────────────────────────────────────┤
+│ git checkout -b feat/nom-de-la-fonctionnalite                   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. DÉVELOPPER                                                     │
+│ - Implémenter la fonctionnalité                                  │
+│ - Ajouter/Modifier les tests si applicable                      │
+│ - Mettre à jour la documentation si nécessaire                  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 4. VÉRIFICATION QUALITÉ                                           │
+├─────────────────────────────────────────────────────────────────┤
+│ pnpm lint:fix                                                    │
+│ pnpm format                                                      │
+│ # Tester dans le navigateur                                      │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 5. COMMITTER                                                      │
+├─────────────────────────────────────────────────────────────────┤
+│ git add .                                                        │
+│ git commit -m "feat(inventory): add item combination system"     │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 6. PUSHER & CRÉER PR                                             │
+├─────────────────────────────────────────────────────────────────┤
+│ git push origin feat/nom-de-la-fonctionnalite                   │
+│ # Créer PR sur GitHub ciblant "dev"                             │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 7. REVIEW & MERGE                                                │
+│ - Les mainteneurs review la PR                                   │
+│ - Corriger les retours si nécessaire                             │
+│ - PR mergée dans dev par le mainteneur                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+#### Workflow 2 : Corriger un bug (en développement)
+
+Même workflow que pour les features, mais avec le préfixe `fix/`
+
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b fix/fix-inventory-persistence
+
+# Corriger le bug
+pnpm lint:fix && pnpm format
+
+git add .
+git commit -m "fix(inventory): resolve localStorage sync issue"
+git push origin fix/fix-inventory-persistence
+
+# Créer PR ciblant dev
+```
+
+---
+
+#### Workflow 3 : Mettre à jour la documentation
+
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b docs/update-setup-guide
+
+# Faire les modifications de documentation
+# Pas de changements de code généralement
+
+git add .
+git commit -m "docs: clarify installation requirements in README"
+git push origin docs/update-setup-guide
+
+# Créer PR ciblant dev
+```
+
+**La documentation inclut :**
+
+- Fichiers `.md` dans `docs/`
+- README.md
+- CONTRIBUTING.md
+- Commentaires de code (JSDoc)
+- Commentaires inline pour la logique complexe
+
+---
+
+#### Workflow 4 : Changements de style/formatage
+
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b style/improve-code-formatting
+
+# Exécuter les formatters automatiques
+pnpm lint:fix
+pnpm format
+
+git add .
+git commit -m "style: apply prettier to all CSS files"
+git push origin style/improve-code-formatting
+
+# Créer PR ciblant dev
+```
+
+**Quand utiliser :**
+
+- Mises à jour de formatage Prettier
+- Améliorations des règles ESLint
+- Améliorations de cohérence du style de code
+
+---
+
+#### Workflow 5 : Refactorisation (sans changement de comportement)
+
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b refactor/optimize-hubspot-loader
+
+# Refactoriser le code
+# IMPORTANT : Ne pas changer le comportement utilisateur
+# Ajouter des tests supplémentaires si possible
+
+pnpm lint:fix && pnpm format
+
+git add .
+git commit -m "refactor(hubspots): extract loading logic to separate module"
+git push origin refactor/optimize-hubspot-loader
+
+# Créer PR ciblant dev
+```
+
+**Règles de refactorisation :**
+
+- Ne doit pas changer le comportement visible par l'utilisateur
+- Doit améliorer la maintenabilité, performance ou lisibilité
+- Peut nécessiter des tests supplémentaires pour vérifier l'absence de régressions
+
+---
+
+#### Workflow 6 : Maintenance/Chores
+
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b chore/update-dependencies
+
+# Tâches de maintenance :
+# - Mettre à jour les dépendances pnpm
+# - Mettre à jour les versions GitHub Actions
+# - Améliorer le pipeline CI/CD
+# - Ajouter/Modifier des fichiers de configuration
+
+pnpm lint:fix && pnpm format
+
+git add .
+git commit -m "chore(deps): update pnpm lock file to v9.0"
+git push origin chore/update-dependencies
+
+# Créer PR ciblant dev
+```
+
+**Exemples de chores :**
+
+- Mises à jour de dépendances
+- Changements de configuration
+- Améliorations des scripts de build
+- Mises à jour des outils de développement
+
+---
+
+#### Workflow 7 : Hotfix (Bug critique en production)
+
+Utilisé quand un bug critique est trouvé en production (branche `main`)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. CRÉER BRANCHE HOTFIX DEPUIS MAIN                              │
+├─────────────────────────────────────────────────────────────────┤
+│ git checkout main                                                │
+│ git pull origin main                                             │
+│ git checkout -b hotfix/critical-security-fix                     │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. CORRIGER LE PROBLÈME                                          │
+│ - Corriger le bug                                                │
+│ - Incrémenter la version PATCH dans package.json                 │
+│ - Mettre à jour CHANGELOG.md                                     │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. COMMIT & PUSH                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ git add .                                                        │
+│ git commit -m "fix: resolve critical authentication bypass"      │
+│ git tag -a v1.2.1 -m "Hotfix v1.2.1"                            │
+│ git push origin hotfix/critical-security-fix --tags              │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 4. CRÉER PR                                                      │
+│ # Créer PR : hotfix/xxx → main                                   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 5. MERGER & SYNCHRONISER DEV                                     │
+│ Après merge de la PR dans main :                                 │
+│ git checkout dev                                                 │
+│ git merge main                                                   │
+│ git push origin dev                                              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Règles de hotfix :**
+
+- Uniquement pour les bugs critiques affectant la production
+- Changements minimaux possibles
+- Incrémenter la version PATCH
+- Créer le tag immédiatement
+- Doit synchroniser avec dev après le merge
+
+---
+
+#### Workflow 8 : Créer une Release
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. PRÉPARER LA RELEASE                                           │
+│ - S'assurer que toutes les fonctionnalités sont dans dev        │
+│ - Faire tous les tests                                           │
+│ - Décider du numéro de version (MAJOR.MINOR.PATCH)              │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. CRÉER BRANCHE DE RELEASE                                      │
+├─────────────────────────────────────────────────────────────────┤
+│ git checkout dev                                                 │
+│ git pull origin dev                                              │
+│ git checkout -b release/1.2.0                                   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. PRÉPARATION RELEASE (sur la branche release)                  │
+├─────────────────────────────────────────────────────────────────┤
+│ - Corrections de bugs FINALES UNIQUEMENT                         │
+│ - Exécuter pnpm lint:fix && pnpm format                          │
+│ - Mettre à jour la version dans package.json                     │
+│ - Mettre à jour CHANGELOG.md avec les notes de release           │
+│ - Tester minutieusement                                          │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 4. COMMIT DES CHANGEMENTS DE RELEASE                             │
+├─────────────────────────────────────────────────────────────────┤
+│ git add .                                                        │
+│ git commit -m "release: prepare v1.2.0"                         │
+│ git push origin release/1.2.0                                    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 5. CRÉER RELEASE PR                                              │
+│ # Créer PR : release/1.2.0 → main                                │
+│ # Inclure :                                                       │
+│   - Résumé des changements de version                            │
+│   - Entries du Changelog                                         │
+│   - Notes de test                                                │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ 6. APRÈS LE MERGE DANS MAIN                                      │
+├─────────────────────────────────────────────────────────────────┤
+│ # Créer la release GitHub avec le tag                            │
+│ # Sur GitHub : Releases → Draft new release                      │
+│ # Tag: v1.2.0                                                    │
+│ # Title: Release v1.2.0                                          │
+│ # Description: Copier depuis CHANGELOG.md                        │
+│                                                                 │
+│ # Synchroniser dev avec main :                                   │
+│ git checkout dev                                                 │
+│ git merge main                                                   │
+│ git push origin dev                                              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Règles de la branche release :**
+
+- ✅ Corrections de bugs
+- ✅ Améliorations de formatage
+- ✅ Mises à jour de documentation
+- ✅ Mises à jour de version
+- ❌ Nouvelles fonctionnalités
+- ❌ Refactorisations
+- ❌ Breaking changes
+
+---
+
+#### Guide de décision pour les versions
+
+| Type de changement            | Incrément | Exemple     |
+| ----------------------------- | --------- | ----------- |
+| Nouvelle salle/puzzle         | MINOR     | 1.0 → 1.1   |
+| Nouveau mécanisme de jeu      | MINOR     | 1.0 → 1.1   |
+| Correction de bug             | PATCH     | 1.1 → 1.1.1 |
+| Amélioration performance      | PATCH     | 1.1 → 1.1.1 |
+| Amélioration visuelle/UI      | PATCH     | 1.1 → 1.1.1 |
+| Breaking change (format save) | MAJOR     | 1.x → 2.0   |
+
+---
+
+#### Tableau de référence rapide
+
+| Objectif         | Branche De | Nom de Branche  | Type Commit | Cible PR   |
+| ---------------- | ---------- | --------------- | ----------- | ---------- |
+| Ajouter feature  | dev        | `feat/xxx`      | `feat:`     | dev        |
+| Fixer bug        | dev        | `fix/xxx`       | `fix:`      | dev        |
+| Update docs      | dev        | `docs/xxx`      | `docs:`     | dev        |
+| Formater code    | dev        | `style/xxx`     | `style:`    | dev        |
+| Refactorer       | dev        | `refactor/xxx`  | `refactor:` | dev        |
+| Maintenance      | dev        | `chore/xxx`     | `chore:`    | dev        |
+| Hotfix release   | main       | `hotfix/xxx`    | `fix:`      | main → dev |
+| Préparer release | dev        | `release/x.y.z` | `release:`  | main       |
+
 ### 5. Tester vos modifications
 
 1. Ouvrez `index.html` dans votre navigateur
@@ -158,7 +544,7 @@ git commit -m "style: améliorer l'apparence de l'écran de fin"
 git push origin feat/nom-de-votre-fonctionnalite
 ```
 
-Créez ensuite une Pull Request sur GitHub.
+Créez ensuite une Pull Request sur GitHub ciblant la branche **dev**.
 
 ## Conventions de code
 
@@ -250,6 +636,7 @@ Avant de soumettre une PR, vérifiez :
 - [ ] Les transitions d'état fonctionnent comme prévu
 - [ ] Les conditions de visibilité des hubspots fonctionnent
 - [ ] La documentation est mise à jour si nécessaire
+- [ ] La PR cible la branche `dev` (sauf pour les releases)
 
 ## Signaler des problèmes
 
