@@ -1,15 +1,26 @@
-# Flags (Drapeaux)
+# Flags
 
-Les "flags" sont des variables booléennes qui permettent de suivre l'état de certaines conditions dans le jeu (par exemple, si une porte a été déverrouillée).
+Flags are boolean variables that track the state of certain conditions in the game (e.g., whether a door has been unlocked).
 
-## Utilisation
+## Overview
 
-Les flags sont généralement activés (`true`) ou désactivés (`false`) via les [hubspots](./hubspots.md).
+Flags are used to:
 
-- `giveFlags`: Un tableau de noms de flags à activer (`true`).
-- `removeFlags`: Un tableau de noms de flags à désactiver (`false`).
+- Track player progress
+- Control hubspot visibility
+- Enable/disable game features
+- Remember player choices
 
-**Exemple:**
+## Setting Flags
+
+Flags are typically activated (`true`) or deactivated (`false`) through hubspots.
+
+| Property      | Description                                 |
+| ------------- | ------------------------------------------- |
+| `giveFlags`   | Array of flag names to activate (`true`)    |
+| `removeFlags` | Array of flag names to deactivate (`false`) |
+
+**Example:**
 
 ```json
 {
@@ -22,26 +33,205 @@ Les flags sont généralement activés (`true`) ou désactivés (`false`) via le
 }
 ```
 
-Dans cet exemple, lorsque le joueur utilise la `goldenKey` sur la porte, le flag `doorUnlocked` est activé.
+In this example, when the player uses the `goldenKey` on the door, the `doorUnlocked` flag is activated.
 
-## Conditions de Flags
+## Flag Conditions
 
-Vous pouvez contrôler la visibilité des hubspots en fonction de l'état des flags.
+You can control hubspot visibility based on flag states.
 
-- `requireFlags`: Le hubspot ne sera visible que si **tous** les flags de la liste sont activés.
-- `requireAnyFlags`: Le hubspot ne sera visible que si **au moins un** des flags de la liste est activé.
-- `requireNotFlags`: Le hubspot ne sera visible que si **aucun** des flags de la liste n'est activé.
+| Condition         | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| `requireFlags`    | Hubspot visible only if **all** flags are active    |
+| `requireAnyFlags` | Hubspot visible if **at least one** flag is active  |
+| `requireNotFlags` | Hubspot visible if **none** of the flags are active |
 
-**Exemple:**
+**Example:**
 
 ```json
 {
     "id": "exitDoor",
     "type": "finish",
     "visibleIn": ["room1"],
+    "emoji": "🚪",
     "requireFlags": ["doorUnlocked"],
     "win": true
 }
 ```
 
-Dans cet exemple, la porte de sortie n'est visible que si le flag `doorUnlocked` est activé.
+In this example, the exit door is only visible if the `doorUnlocked` flag is active.
+
+## Common Use Cases
+
+### Door Unlocking
+
+```json
+[
+    {
+        "id": "lockedDoor",
+        "type": "useItem",
+        "visibleIn": ["corridor"],
+        "x": 80,
+        "y": 50,
+        "emoji": "🚪",
+        "requireItems": ["goldenKey"],
+        "noItemMessage": "The door is locked.",
+        "wrongItemMessage": "That key doesn't fit.",
+        "action": "enterTreasureRoom",
+        "giveFlags": ["doorUnlocked"]
+    },
+    {
+        "id": "openDoor",
+        "type": "action",
+        "visibleIn": ["corridor"],
+        "x": 80,
+        "y": 50,
+        "emoji": "🚪🚪",
+        "action": "enterTreasureRoom",
+        "requireFlags": ["doorUnlocked"]
+    }
+]
+```
+
+### Puzzle Progress
+
+```json
+[
+    {
+        "id": "puzzle1",
+        "type": "secret",
+        "visibleIn": ["puzzleRoom"],
+        "x": 30,
+        "y": 50,
+        "emoji": "🔐",
+        "prompt": "Enter the code:",
+        "secretCode": "1234",
+        "onSuccess": {
+            "type": "modal",
+            "modalText": "Correct! The first mechanism unlocks.",
+            "giveFlags": ["puzzle1Solved"]
+        }
+    },
+    {
+        "id": "puzzle2",
+        "type": "secret",
+        "visibleIn": ["puzzleRoom"],
+        "x": 70,
+        "y": 50,
+        "emoji": "🔐",
+        "prompt": "Enter the code:",
+        "secretCode": "5678",
+        "onSuccess": {
+            "type": "modal",
+            "modalText": "Correct! The second mechanism unlocks.",
+            "giveFlags": ["puzzle2Solved"]
+        }
+    },
+    {
+        "id": "finalDoor",
+        "type": "action",
+        "visibleIn": ["puzzleRoom"],
+        "x": 50,
+        "y": 80,
+        "emoji": "🏆",
+        "action": "victory",
+        "requireFlags": ["puzzle1Solved", "puzzle2Solved"]
+    }
+]
+```
+
+### Choice Tracking
+
+```json
+[
+    {
+        "id": "choosePathA",
+        "type": "action",
+        "visibleIn": ["crossroads"],
+        "x": 30,
+        "y": 60,
+        "emoji": "🌲",
+        "action": "forestPath",
+        "giveFlags": ["choseForest"]
+    },
+    {
+        "id": "choosePathB",
+        "type": "action",
+        "visibleIn": ["crossroads"],
+        "x": 70,
+        "y": 60,
+        "emoji": "🏔️",
+        "action": "mountainPath",
+        "giveFlags": ["choseMountain"]
+    },
+    {
+        "id": "forestEncounter",
+        "type": "modal",
+        "visibleIn": ["forestPath"],
+        "emoji": "🐺",
+        "modalText": "A wolf appears!",
+        "requireFlags": ["choseForest"]
+    },
+    {
+        "id": "mountainEncounter",
+        "type": "modal",
+        "visibleIn": ["mountainPath"],
+        "emoji": "🦅",
+        "modalText": "An eagle soars overhead!",
+        "requireFlags": ["choseMountain"]
+    }
+]
+```
+
+## Removing Flags
+
+You can also deactivate flags using the `removeFlags` property:
+
+```json
+{
+    "id": "resetPuzzle",
+    "type": "action",
+    "visibleIn": ["puzzleRoom"],
+    "x": 10,
+    "y": 10,
+    "emoji": "🔄",
+    "action": "resetPuzzle",
+    "removeFlags": ["puzzle1Solved", "puzzle2Solved"],
+    "modalText": "The puzzle resets."
+}
+```
+
+## Combining with Inventory Conditions
+
+Flags can be combined with inventory conditions for complex game logic:
+
+```json
+{
+    "id": "conditionalDoor",
+    "type": "useItem",
+    "visibleIn": ["hallway"],
+    "x": 80,
+    "y": 50,
+    "emoji": "🚪",
+    "requireItems": ["masterKey"],
+    "requireFlags": ["keyCollected", "bossDefeated"],
+    "requireNotFlags": ["doorOpened"],
+    "noItemMessage": "You need a key to open this door.",
+    "action": "enterSecretRoom",
+    "giveFlags": ["doorOpened"]
+}
+```
+
+This hubspot will only be visible if:
+
+- Player has the `masterKey` item
+- The `keyCollected` flag is active
+- The `bossDefeated` flag is active
+- The `doorOpened` flag is NOT active
+
+## Best Practices
+
+1. **Use descriptive names**: Name flags clearly (e.g., `doorUnlocked` not `flag1`)
+2. **Group related flags**: Use prefixes for related flags (e.g., `puzzle1Solved`, `puzzle2Solved`)
+3. **Keep flags minimal**: Only create flags when necessary for game logic
+4. **Document complex logic**: Add comments or documentation for complex flag combinations
+5. **Test thoroughly**: Verify all flag combinations work correctly
