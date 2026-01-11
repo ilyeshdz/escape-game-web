@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+    - name: 📖 Documentation
+      url: https://github.com/ilyeshdz/escape-game-web/tree/main/docs
+      about: Check the docs for guides and API reference
+    - name: 🐛 Existing Bugs
+      url: https://github.com/ilyeshdz/escape-game-web/issues?q=is%3Aissue+label%3Atype%3Abug
+      about: Search for known issues before reporting
