@@ -40,3 +40,7 @@ export function checkCondition(condition) {
     if (condition.requireNotFlags && !hasNoneOfFlags(condition.requireNotFlags)) return false;
     return true;
 }
+
+export function getFlags() {
+    return flags;
+}

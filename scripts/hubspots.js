@@ -130,7 +130,7 @@ export function getHubspots() {
     return activeHubspots;
 }
 
-function updateHubspotsVisibility() {
+export function updateHubspotsVisibility() {
     const currentState = getStateMachine().getState();
 
     activeHubspots = hubspotsData
