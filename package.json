@@ -10,6 +10,8 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0",
+    "changelog:update": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s",
     "prepare": "husky"
   },
   "keywords": [],
@@ -17,7 +19,10 @@
   "license": "ISC",
   "packageManager": "pnpm@10.22.0",
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@eslint/js": "^9.39.2",
+    "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
