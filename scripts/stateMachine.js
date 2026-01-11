@@ -18,13 +18,12 @@ class StateMachine {
      */
     transition(action) {
         const nextState = this.transitions[this.currentState]?.[action];
-        
+
         if (nextState) {
-            const oldState = this.currentState;
             this.currentState = nextState;
             return true;
         }
-        
+
         return false;
     }
 
@@ -57,17 +56,12 @@ export function initStateMachine(config) {
  * @returns {Promise<StateMachine>} Initialized state machine
  */
 export async function loadStateMachine() {
-    try {
-        const response = await fetch('./data/gameConfig.json');
-        if (!response.ok) {
-            throw new Error(`Failed to load state machine config: ${response.statusText}`);
-        }
-        const config = await response.json();
-        return initStateMachine(config);
-    } catch (error) {
-        console.error('[StateMachine] Error loading configuration:', error);
-        throw error;
+    const response = await fetch('./data/gameConfig.json');
+    if (!response.ok) {
+        throw new Error(`Failed to load state machine config: ${response.statusText}`);
     }
+    const config = await response.json();
+    return initStateMachine(config);
 }
 
 /**

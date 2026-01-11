@@ -21,9 +21,7 @@ function loadSceneImage(path) {
     sceneImage.onload = () => {
         resizeCanvas();
     };
-    sceneImage.onerror = () => {
-        console.error('[CanvasScene] Failed to load scene image:', path);
-    };
+    sceneImage.onerror = () => {};
     sceneImage.src = path;
 }
 
@@ -70,18 +68,18 @@ function setupEventListeners() {
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        
+
         hoveredHubspotId = getHubspotAtPosition(x, y);
-        
+
         if (!isKeyboardNavigating) {
             canvas.style.cursor = hoveredHubspotId ? 'pointer' : 'default';
         }
     });
 
-    canvas.addEventListener('click', (e) => {
+    canvas.addEventListener('click', () => {
         canvas.focus();
         if (hoveredHubspotId) {
-            const hubspot = hubspots.find(h => h.id === hoveredHubspotId);
+            const hubspot = hubspots.find((h) => h.id === hoveredHubspotId);
             if (hubspot && hubspot.onClick) {
                 hubspot.onClick(hubspot);
             }
@@ -101,8 +99,8 @@ function setupEventListeners() {
 }
 
 function handleKeyboardNavigation(e) {
-    const visibleHubspots = hubspots.filter(h => !h.isHidden);
-    
+    const visibleHubspots = hubspots.filter((h) => !h.isHidden);
+
     if (visibleHubspots.length === 0) return;
 
     if (e.key === 'Tab') {
@@ -114,7 +112,8 @@ function handleKeyboardNavigation(e) {
             focusedHubspotIndex = 0;
         } else {
             const direction = e.shiftKey ? -1 : 1;
-            focusedHubspotIndex = (focusedHubspotIndex + direction + visibleHubspots.length) % visibleHubspots.length;
+            focusedHubspotIndex =
+                (focusedHubspotIndex + direction + visibleHubspots.length) % visibleHubspots.length;
         }
 
         const focusedHubspot = visibleHubspots[focusedHubspotIndex];
@@ -125,7 +124,7 @@ function handleKeyboardNavigation(e) {
     } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         if (focusedHubspotIndex >= 0 && hoveredHubspotId) {
-            const hubspot = hubspots.find(h => h.id === hoveredHubspotId);
+            const hubspot = hubspots.find((h) => h.id === hoveredHubspotId);
             if (hubspot && hubspot.onClick) {
                 hubspot.onClick(hubspot);
             }
@@ -192,7 +191,7 @@ function renderLoop() {
 }
 
 function renderHubspots() {
-    hubspots.forEach(hubspot => {
+    hubspots.forEach((hubspot) => {
         const x = (hubspot.x / 100) * canvas.renderWidth + canvas.offsetX;
         const y = (hubspot.y / 100) * canvas.renderHeight + canvas.offsetY;
         const size = getHubspotSize(hubspot);
@@ -233,7 +232,7 @@ function renderHubspots() {
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = Math.max(1.5, size / 20);
             ctx.stroke();
-            
+
             if (hubspot.tooltip) {
                 renderTooltip(x, y, hubspot.tooltip, size);
             }
@@ -241,9 +240,9 @@ function renderHubspots() {
     });
 
     if (isKeyboardNavigating && focusedHubspotIndex >= 0) {
-        const visibleHubspots = hubspots.filter(h => !h.isHidden);
+        const visibleHubspots = hubspots.filter((h) => !h.isHidden);
         const focusedHubspot = visibleHubspots[focusedHubspotIndex];
-        
+
         if (focusedHubspot) {
             const x = (focusedHubspot.x / 100) * canvas.renderWidth + canvas.offsetX;
             const y = (focusedHubspot.y / 100) * canvas.renderHeight + canvas.offsetY;

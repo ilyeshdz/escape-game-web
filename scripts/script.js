@@ -6,21 +6,17 @@ import { initFlags } from './flags.js';
 import { initCanvasScene } from './canvasScene.js';
 
 async function init() {
-    try {
-        await loadStateMachine();
-        initInventory();
-        initFlags();
-        initSecretInput();
-        initAccessibility();
-        await setupHubspots();
-        setupResizeHandler();
+    await loadStateMachine();
+    initInventory();
+    initFlags();
+    initSecretInput();
+    initAccessibility();
+    await setupHubspots();
+    setupResizeHandler();
 
-        const canvas = document.getElementById('game-canvas');
-        const hubspotsData = getHubspots();
-        initCanvasScene(canvas, './assets/scene1.png', hubspotsData);
-    } catch (error) {
-        console.error('[Script] Initialization failed:', error);
-    }
+    const canvas = document.getElementById('game-canvas');
+    const hubspotsData = getHubspots();
+    initCanvasScene(canvas, './assets/scene1.png', hubspotsData);
 }
 
 init();

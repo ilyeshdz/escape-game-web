@@ -18,12 +18,12 @@ const hubspotHandlers = {
     finish: handleFinishAction,
     link: handleLinkAction,
     secret: showSecretInput,
-    useItem: handleUseItem,
+    useItem: handleUseItem
 };
 
 function executeHubspotActions(hubspotData) {
     if (hubspotData.giveItems) {
-        hubspotData.giveItems.forEach(item => {
+        hubspotData.giveItems.forEach((item) => {
             if (addItem(item)) {
                 announce(`Objet ajouté: ${item.name}`);
                 if (item.pickupMessage) {
@@ -33,19 +33,19 @@ function executeHubspotActions(hubspotData) {
         });
     }
     if (hubspotData.giveFlags) {
-        hubspotData.giveFlags.forEach(flag => {
+        hubspotData.giveFlags.forEach((flag) => {
             setFlag(flag);
             announce(`État changé: ${flag}`);
         });
     }
     if (hubspotData.removeFlags) {
-        hubspotData.removeFlags.forEach(flag => {
+        hubspotData.removeFlags.forEach((flag) => {
             unsetFlag(flag);
             announce(`État terminé: ${flag}`);
         });
     }
     if (hubspotData.removeItems) {
-        hubspotData.removeItems.forEach(itemId => {
+        hubspotData.removeItems.forEach((itemId) => {
             removeItem(itemId);
             announce(`Objet utilisé et retiré`);
         });
@@ -74,8 +74,6 @@ function handleAction(hubspotData) {
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
         executeHubspotActions(hubspotData);
         updateHubspotsVisibility();
-    } else if (hubspotData.action) {
-        console.warn(`[Hubspot] Action "${hubspotData.action}" failed for hubspot "${hubspotData.id}"`);
     }
 }
 
@@ -109,15 +107,12 @@ function handleUseItem(hubspotData) {
             removeItem(selectedItem.id);
         }
         updateHubspotsVisibility();
-    } else {
-        console.warn(`[UseItem] Transition failed for "${hubspotData.id}"`);
     }
 }
 
 export async function setupHubspots() {
     hubspotsData = await loadHubspotsData();
     if (hubspotsData.length === 0) {
-        console.warn('[Hubspots] No hubspots data loaded');
         return;
     }
     updateHubspotsVisibility();
@@ -131,17 +126,19 @@ function updateHubspotsVisibility() {
     const currentState = getStateMachine().getState();
 
     activeHubspots = hubspotsData
-        .map(hubspotData => {
+        .map((hubspotData) => {
             const isVisibleInState = hubspotData.visibleIn.includes(currentState);
-            const meetsConditions = checkCondition({
-                requireFlags: hubspotData.requireFlags,
-                requireAnyFlags: hubspotData.requireAnyFlags,
-                requireNotFlags: hubspotData.requireNotFlags
-            }) && checkInventoryCondition({
-                requireItems: hubspotData.requireItems,
-                requireAnyItems: hubspotData.requireAnyItems,
-                requireNotItems: hubspotData.requireNotItems
-            });
+            const meetsConditions =
+                checkCondition({
+                    requireFlags: hubspotData.requireFlags,
+                    requireAnyFlags: hubspotData.requireAnyFlags,
+                    requireNotFlags: hubspotData.requireNotFlags
+                }) &&
+                checkInventoryCondition({
+                    requireItems: hubspotData.requireItems,
+                    requireAnyItems: hubspotData.requireAnyItems,
+                    requireNotItems: hubspotData.requireNotItems
+                });
 
             if (isVisibleInState && meetsConditions) {
                 return {
@@ -157,12 +154,17 @@ function updateHubspotsVisibility() {
             }
             return null;
         })
-        .filter(h => h !== null);
+        .filter((h) => h !== null);
 
     updateCanvasHubspots(activeHubspots);
 
-    activeHubspots.forEach(hubspotData => {
-        if (hubspotData.autoShow && hubspotData.type === 'modal' && hubspotData.modalText && !autoShownHubspots.has(hubspotData.id)) {
+    activeHubspots.forEach((hubspotData) => {
+        if (
+            hubspotData.autoShow &&
+            hubspotData.type === 'modal' &&
+            hubspotData.modalText &&
+            !autoShownHubspots.has(hubspotData.id)
+        ) {
             autoShownHubspots.add(hubspotData.id);
             setTimeout(() => showModal(hubspotData.modalText), 100);
         }
@@ -173,7 +175,7 @@ function showModal(text) {
     const modal = document.getElementById('modal');
     const modalText = document.getElementById('modal-text');
     const closeBtn = modal?.querySelector('.modal-close');
-    
+
     if (modal && modalText) {
         lastFocusedElement = document.activeElement;
         modalText.innerHTML = text;
@@ -199,7 +201,9 @@ export function announce(message) {
     const announcer = document.getElementById('a11y-announcer');
     if (announcer) {
         announcer.textContent = message;
-        setTimeout(() => { announcer.textContent = ''; }, 1000);
+        setTimeout(() => {
+            announcer.textContent = '';
+        }, 1000);
     }
 }
 
@@ -256,12 +260,18 @@ function checkSecret() {
                     showFinish(win !== undefined ? win : true);
                     break;
                 default:
-                    if (currentSecretHubspotData.action && getStateMachine().transition(currentSecretHubspotData.action)) {
+                    if (
+                        currentSecretHubspotData.action &&
+                        getStateMachine().transition(currentSecretHubspotData.action)
+                    ) {
                         executeHubspotActions(currentSecretHubspotData);
                         updateHubspotsVisibility();
                     }
             }
-        } else if (currentSecretHubspotData.action && getStateMachine().transition(currentSecretHubspotData.action)) {
+        } else if (
+            currentSecretHubspotData.action &&
+            getStateMachine().transition(currentSecretHubspotData.action)
+        ) {
             executeHubspotActions(currentSecretHubspotData);
             updateHubspotsVisibility();
         }
@@ -276,9 +286,7 @@ function checkSecret() {
 export function initSecretInput() {
     const secretClose = document.getElementById('secret-close');
     const inspectClose = document.getElementById('inspect-close');
-    const secretModalElement = document.getElementById('secret-modal');
-    const inspectModalElement = document.getElementById('item-inspect-modal');
-    
+
     secretSubmit.addEventListener('click', checkSecret);
     secretCancel.addEventListener('click', () => {
         secretModal.classList.remove('active');
@@ -288,7 +296,7 @@ export function initSecretInput() {
         }
     });
     secretInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkSecret());
-    
+
     if (secretClose) {
         secretClose.addEventListener('click', () => {
             secretModal.classList.remove('active');
@@ -298,7 +306,7 @@ export function initSecretInput() {
             }
         });
     }
-    
+
     if (inspectClose) {
         inspectClose.addEventListener('click', () => {
             const modal = document.getElementById('item-inspect-modal');
@@ -375,7 +383,11 @@ export function initAccessibility() {
         });
 
         document.addEventListener('click', (e) => {
-            if (!toggleHelp.contains(e.target) && !helpPanel.contains(e.target) && !helpPanel.hidden) {
+            if (
+                !toggleHelp.contains(e.target) &&
+                !helpPanel.contains(e.target) &&
+                !helpPanel.hidden
+            ) {
                 helpPanel.hidden = true;
                 toggleHelp.setAttribute('aria-expanded', 'false');
             }
@@ -388,7 +400,7 @@ export function initAccessibility() {
 function initLandscapeWarning() {
     const warning = document.getElementById('landscape-warning');
     const dismissBtn = document.querySelector('.landscape-dismiss');
-    
+
     if (!warning) return;
 
     const checkOrientation = () => {

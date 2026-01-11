@@ -30,7 +30,7 @@ export function hasAnyFlag(flagNames) {
 }
 
 export function hasNoneOfFlags(flagNames) {
-    return flagNames.every(flagName => !hasFlag(flagName));
+    return flagNames.every((flagName) => !hasFlag(flagName));
 }
 
 export function checkCondition(condition) {

@@ -13,7 +13,7 @@ export function initInventory() {
             const data = JSON.parse(saved);
             inventory = data.inventory || [];
             selectedItem = data.selectedItem || null;
-        } catch (e) {
+        } catch {
             inventory = [];
             selectedItem = null;
         }
@@ -62,7 +62,7 @@ export function addItem(item) {
 }
 
 export function removeItem(itemId) {
-    const index = inventory.findIndex(item => item.id === itemId);
+    const index = inventory.findIndex((item) => item.id === itemId);
     if (index !== -1) {
         inventory.splice(index, 1);
         if (selectedItem === itemId) {
@@ -76,7 +76,7 @@ export function removeItem(itemId) {
 }
 
 export function hasItem(itemId) {
-    return inventory.some(item => item.id === itemId);
+    return inventory.some((item) => item.id === itemId);
 }
 
 export function hasAllItems(itemIds) {
@@ -88,11 +88,11 @@ export function hasAnyItem(itemIds) {
 }
 
 export function hasNoneOfItems(itemIds) {
-    return itemIds.every(itemId => !hasItem(itemId));
+    return itemIds.every((itemId) => !hasItem(itemId));
 }
 
 export function getItem(itemId) {
-    return inventory.find(item => item.id === itemId) || null;
+    return inventory.find((item) => item.id === itemId) || null;
 }
 
 export function selectItem(itemId) {
