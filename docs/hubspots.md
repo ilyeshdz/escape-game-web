@@ -14,37 +14,6 @@ Chaque hubspot est un objet JSON avec les propriétés suivantes:
 - `tooltip` (string, optionnel): Un texte qui s'affiche au survol du hubspot.
 - `isHidden` (boolean, optionnel): Si `true`, le hubspot est invisible mais toujours cliquable.
 
-## Notifications
-
-Les hubspots peuvent afficher une notification toast au lieu d'une modale via la propriété `notificationMessage`. Les notifications sont opt-in - si la propriété n'est pas définie, le comportement par défaut s'applique.
-
-**Propriétés:**
-
-- `notificationMessage` (string, optionnel): Le texte de la notification. Si défini, une notification toast s'affiche au lieu de la modale.
-- `notificationType` (string, optionnel): Le type de notification. Valeurs possibles:
-    - `info` (défaut): Notification bleue
-    - `success`: Notification verte
-    - `error`: Notification rouge
-
-**Exemple:**
-
-```json
-{
-    "id": "treasureChest",
-    "type": "modal",
-    "visibleIn": ["room1"],
-    "emoji": "📦",
-    "notificationMessage": "Vous avez trouvé plusieurs objets!",
-    "notificationType": "success",
-    "giveItems": [{ "id": "potion", "name": "Potion", "emoji": "🧪" }]
-}
-```
-
-**Comportement:**
-
-- Avec `notificationMessage`: Affiche une notification toast, pas de modale
-- Sans `notificationMessage`: Affiche la modale avec `modalText` (comportement par défaut)
-
 ## Affichage des hubspots
 
 Les hubspots avec la propriété `emoji` sont affichés comme des émojis sur le canvas. Les autres hubspots sont affichés comme des cercles blancs semi-transparents.
@@ -53,11 +22,11 @@ Les hubspots avec la propriété `emoji` sont affichés comme des émojis sur le
 
 ### `modal`
 
-Affiche une fenêtre modale ou une notification toast.
+Affiche une fenêtre modale avec du texte.
 
 **Propriétés supplémentaires:**
 
-- `modalText` (string, optionnel): Le texte à afficher dans la modale. Si `notificationMessage` est défini, ce texte n'est pas utilisé.
+- `modalText` (string, requis): Le texte à afficher dans la modale (peut contenir du HTML).
 
 ### `action`
 

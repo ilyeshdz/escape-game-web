@@ -2,42 +2,36 @@ name: Release
 
 on:
     push:
-        tags:
-            - 'v*'
+        branches: [main]
+
+permissions:
+    contents: write
+    issues: write
+    pull-requests: write
+
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
     release:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-
-            - name: Update package.json version
-              run: |
-                  # Get tag name (e.g. refs/tags/v1.2.3 -> v1.2.3)
-                  TAG_REF=${GITHUB_REF#refs/tags/}
-                  # Remove leading "v" if present => 1.2.3
-                  VERSION=${TAG_REF#v}
-                  echo "Tag: $TAG_REF  Version: $VERSION"
-
-                  # Set package.json version (quote the value)
-                  npm pkg set version="$VERSION"
-
-                  # Configure git user and only commit if package.json changed
-                  git config user.name "github-actions[bot]"
-                  git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git add package.json
-                  if git diff --staged --quiet; then
-                      echo "No package.json changes to commit"
-                  else
-                      git commit -m "chore: bump version to $VERSION"
-                      git push
-                  fi
-
-            - name: Create Release
-              uses: softprops/action-gh-release@v2
               with:
-                  body_path: CHANGELOG.md
-                  draft: false
-                  prerelease: false
+                  fetch-depth: 0
+                  token: ${{ secrets.GH_TOKEN }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Semantic Release
               env:
-                  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+                  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+              run: pnpm exec semantic-release

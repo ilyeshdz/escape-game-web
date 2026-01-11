@@ -8,34 +8,34 @@ Ce fichier contient la configuration de la machine à états.
 
 ```json
 {
-  "initialState": "room1",
-  "transitions": {
-    "room1": {
-      "openSafe": "safeOpen"
-    },
-    "safeOpen": {
-      "unlockDoor": "safeOpen",
-      "escape": "finished"
-    },
-    "finished": {}
-  }
+    "initialState": "room1",
+    "transitions": {
+        "room1": {
+            "openSafe": "safeOpen"
+        },
+        "safeOpen": {
+            "unlockDoor": "safeOpen",
+            "escape": "finished"
+        },
+        "finished": {}
+    }
 }
 ```
 
 ### `initialState`
 
-*   **Type:** `string`
-*   **Description:** L'état dans lequel le jeu commence.
+- **Type:** `string`
+- **Description:** L'état dans lequel le jeu commence.
 
 ### `transitions`
 
-*   **Type:** `object`
-*   **Description:** Un objet qui définit toutes les transitions possibles dans le jeu.
-*   **Structure:**
-    *   Chaque clé de cet objet est le nom d'un état (par exemple, `"room1"`).
-    *   La valeur de chaque état est un autre objet où:
-        *   La clé est le nom d'une **action** (par exemple, `"openSafe"`).
-        *   La valeur est le nom de l'**état de destination** (par exemple, `"safeOpen"`).
+- **Type:** `object`
+- **Description:** Un objet qui définit toutes les transitions possibles dans le jeu.
+- **Structure:**
+    - Chaque clé de cet objet est le nom d'un état (par exemple, `"room1"`).
+    - La valeur de chaque état est un autre objet où:
+        - La clé est le nom d'une **action** (par exemple, `"openSafe"`).
+        - La valeur est le nom de l'**état de destination** (par exemple, `"safeOpen"`).
 
 ## Comment ça marche
 

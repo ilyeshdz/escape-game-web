@@ -10,9 +10,9 @@ Au lieu de simplement créer un escape game unique, ce projet a été conçu com
 
 Cette approche présente plusieurs avantages :
 
-*   **Maintenabilité :** Il est plus facile de corriger les bugs et d'ajouter des fonctionnalités au moteur de jeu, qui seront ensuite disponibles pour tous les jeux créés avec.
-*   **Lisibilité et Simplicité :** La logique du jeu est entièrement définie dans des fichiers de configuration JSON, ce qui la rend plus facile à lire et à comprendre pour des non-développeurs.
-*   **Rapidité de création :** Une fois le moteur en place, la création de nouveaux scénarios, énigmes et interactions se fait très rapidement en modifiant simplement les fichiers JSON.
+- **Maintenabilité :** Il est plus facile de corriger les bugs et d'ajouter des fonctionnalités au moteur de jeu, qui seront ensuite disponibles pour tous les jeux créés avec.
+- **Lisibilité et Simplicité :** La logique du jeu est entièrement définie dans des fichiers de configuration JSON, ce qui la rend plus facile à lire et à comprendre pour des non-développeurs.
+- **Rapidité de création :** Une fois le moteur en place, la création de nouveaux scénarios, énigmes et interactions se fait très rapidement en modifiant simplement les fichiers JSON.
 
 Le principal défi de cette approche est de concevoir un moteur suffisamment générique pour gérer tous les cas de figure possibles et imaginables dans un escape game.
 
