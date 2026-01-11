@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/ilyeshdz/escape-game-web/compare/v1.2.0...v1.2.1) (2026-01-11)
+
+### Maintenance
+
+- chore: Add issue and pull request templates ([b6a3c8a](https://github.com/ilyeshdz/escape-game-web/commit/b6a3c8a))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
