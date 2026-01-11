@@ -19,9 +19,21 @@
     "tooltip": "Coffre-fort",
     "prompt": "Entrez le code du coffre-fort:",
     "secretCode": "1234",
+    "notificationMessage": "Vous trouvez une clé dorée dans le coffre!",
+    "notificationType": "success",
     "onSuccess": {
       "type": "action",
-      "action": "openSafe"
+      "action": "openSafe",
+      "giveItems": [
+        {
+          "id": "goldenKey",
+          "name": "Clé dorée",
+          "description": "Une clé dorée qui brille légèrement. Elle semble faite pour ouvrir une serrure spéciale.",
+          "emoji": "🔑",
+          "usable": true,
+          "consumable": true
+        }
+      ]
     }
   },
   {
@@ -33,7 +45,8 @@
     "visibleIn": ["room1", "safeOpen"],
     "emoji": "📦",
     "tooltip": "Coffre au trésor",
-    "modalText": "Vous trouvez un coffre au trésor avec plusieurs objets à l'intérieur!",
+    "notificationMessage": "Vous avez trouvé plusieurs objets!",
+    "notificationType": "success",
     "giveItems": [
       {
         "id": "potion",
@@ -70,7 +83,8 @@
     "visibleIn": ["safeOpen"],
     "emoji": "🔓",
     "tooltip": "Coffre-fort ouvert",
-    "modalText": "<strong>Le coffre s'ouvre!</strong><br><br>À l'intérieur, vous trouvez une clé dorée.",
+    "notificationMessage": "Vous trouvez une clé dorée!",
+    "notificationType": "success",
     "requireNotItems": ["goldenKey"],
     "requireNotFlags": ["keyUsed"],
     "giveItems": [
@@ -106,6 +120,8 @@
     "requireItems": ["goldenKey"],
     "emoji": "🚪",
     "tooltip": "Porte",
+    "notificationMessage": "La porte est maintenant déverrouillée!",
+    "notificationType": "success",
     "noItemMessage": "La porte est verrouillée. Sélectionnez la clé dorée dans l'inventaire, puis cliquez sur la porte.",
     "wrongItemMessage": "Cet objet ne sert à rien ici.",
     "action": "unlockDoor",
