@@ -1,6 +1,7 @@
 /**
  * Inventory system for managing collected items
  */
+
 let inventory = [];
 let selectedItem = null;
 const INVENTORY_SIZE = 9;
