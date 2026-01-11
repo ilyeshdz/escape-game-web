@@ -1,0 +1,41 @@
+name: Validate
+
+on:
+    pull_request:
+        branches: [dev, main, release/*]
+
+permissions:
+    contents: read
+    pull-requests: write
+
+concurrency:
+    group: validate-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Validate JSON files
+              run: |
+                  for file in data/*.json; do
+                      echo "Validating $file..."
+                      node -e "JSON.parse(require('fs').readFileSync('$file', 'utf8'))" || exit 1
+                  done
+
+            - name: Check formatting
+              run: pnpm format:check
+
+            - name: Run linting
+              run: pnpm lint
