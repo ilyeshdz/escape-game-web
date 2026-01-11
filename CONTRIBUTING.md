@@ -14,15 +14,21 @@ cd escape-game-web
 
 ### 2. Configuration de l'environnement de développement
 
-Ce projet utilise HTML, CSS et JavaScript pur (ES modules). Aucun outil de build requis.
+Ce projet utilise HTML, CSS et JavaScript pur (ES modules) avec pnpm pour la gestion des dépendances de développement.
 
 ```bash
-# Ouvrez dans votre navigateur en servant le répertoire
+# Installer pnpm si nécessaire
+npm install -g pnpm
+
+# Installer les dépendances
+pnpm install
+
+# Lancer le serveur de développement
 # Avec Python:
 python -m http.server 8000
 
 # Ou avec Node.js (si installé):
-npx serve .
+pnpm exec serve .
 ```
 
 ### 3. Créer une branche
@@ -58,12 +64,49 @@ escape-game-web/
 │   ├── script.js         # Point d'entrée principal
 │   └── stateMachine.js   # Machine à états
 ├── style.css        # Styles principaux
-└── index.html       # Fichier HTML d'entrée
+├── index.html       # Fichier HTML d'entrée
+├── package.json     # Configuration pnpm et scripts
+├── .eslintrc.json   # Configuration ESLint
+├── .prettierrc      # Configuration Prettier
+└── .husky/          # Git hooks (Husky)
 ```
+
+### Outils de qualité de code
+
+Ce projet utilise des outils pour maintenir la qualité du code :
+
+- **ESLint** : Détecte les erreurs et enforce les bonnes pratiques
+- **Prettier** : Formate automatiquement le code
+- **Husky** : Git hooks pour vérifier le code avant chaque commit
+- **lint-staged** : Ne vérifie que les fichiers modifiés
+
+#### Commandes disponibles
+
+```bash
+# Vérifier le code avec ESLint
+pnpm lint
+
+# Corriger automatiquement les erreurs ESLint
+pnpm lint:fix
+
+# Formater le code avec Prettier
+pnpm format
+
+# Vérifier le formatage sans modifier
+pnpm format:check
+```
+
+#### Workflow de développement
+
+1. Créez une branche pour vos modifications
+2. Travaillez sur votre code
+3. Avant de committez, lancez `pnpm lint:fix && pnpm format`
+4. Committez vos modifications (le hook Husky vérifiera le code automatiquement)
 
 #### Concepts clés
 
 Les **hubspots** sont des éléments interactifs définis dans `data/hubspots.json`. Chaque hubspot possède :
+
 - `id`: Identifiant unique
 - `type`: Un parmi : `modal`, `action`, `finish`, `link`, `secret`, `useItem`
 - `x`, `y`: Position (0-100%)
@@ -71,6 +114,7 @@ Les **hubspots** sont des éléments interactifs définis dans `data/hubspots.js
 - `emoji`: Émoji optionnel à afficher sur le canvas
 
 Les objets de l'**inventaire** peuvent avoir :
+
 - `id`, `name`, `description`: Propriétés de base
 - `emoji`: Icône optionnelle (emoji)
 - `icon`: Chemin optionnel vers une image
@@ -99,6 +143,7 @@ git commit -m "style: améliorer l'apparence de l'écran de fin"
 ```
 
 **Types de commits :**
+
 - `feat` : Nouvelle fonctionnalité
 - `fix` : Correction de bug
 - `docs` : Modifications de documentation
