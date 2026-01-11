@@ -6,19 +6,19 @@ Les "flags" sont des variables booléennes qui permettent de suivre l'état de c
 
 Les flags sont généralement activés (`true`) ou désactivés (`false`) via les [hubspots](./hubspots.md).
 
-*   `giveFlags`: Un tableau de noms de flags à activer (`true`).
-*   `removeFlags`: Un tableau de noms de flags à désactiver (`false`).
+- `giveFlags`: Un tableau de noms de flags à activer (`true`).
+- `removeFlags`: Un tableau de noms de flags à désactiver (`false`).
 
 **Exemple:**
 
 ```json
 {
-  "id": "doorUnlock",
-  "type": "useItem",
-  "visibleIn": ["room1"],
-  "requireItems": ["goldenKey"],
-  "action": "unlockDoor",
-  "giveFlags": ["doorUnlocked"]
+    "id": "doorUnlock",
+    "type": "useItem",
+    "visibleIn": ["room1"],
+    "requireItems": ["goldenKey"],
+    "action": "unlockDoor",
+    "giveFlags": ["doorUnlocked"]
 }
 ```
 
@@ -28,19 +28,19 @@ Dans cet exemple, lorsque le joueur utilise la `goldenKey` sur la porte, le flag
 
 Vous pouvez contrôler la visibilité des hubspots en fonction de l'état des flags.
 
-*   `requireFlags`: Le hubspot ne sera visible que si **tous** les flags de la liste sont activés.
-*   `requireAnyFlags`: Le hubspot ne sera visible que si **au moins un** des flags de la liste est activé.
-*   `requireNotFlags`: Le hubspot ne sera visible que si **aucun** des flags de la liste n'est activé.
+- `requireFlags`: Le hubspot ne sera visible que si **tous** les flags de la liste sont activés.
+- `requireAnyFlags`: Le hubspot ne sera visible que si **au moins un** des flags de la liste est activé.
+- `requireNotFlags`: Le hubspot ne sera visible que si **aucun** des flags de la liste n'est activé.
 
 **Exemple:**
 
 ```json
 {
-  "id": "exitDoor",
-  "type": "finish",
-  "visibleIn": ["room1"],
-  "requireFlags": ["doorUnlocked"],
-  "win": true
+    "id": "exitDoor",
+    "type": "finish",
+    "visibleIn": ["room1"],
+    "requireFlags": ["doorUnlocked"],
+    "win": true
 }
 ```
 
