@@ -193,6 +193,53 @@ export function addItem(objet) {
 - Utilisez une indentation cohérente (2 espaces)
 - Validez la syntaxe JSON
 
+### Validation des messages de commit
+
+Ce projet utilise **commitlint** pour valider automatiquement les messages de commit selon le standard [Conventional Commits](https://conventionalcommits.org/).
+
+Si votre message de commit n'est pas valide, le commit sera rejeté. Voici le format attendu :
+
+```
+<type>(<scope>): <description>
+```
+
+**Types disponibles :**
+
+- `feat` - Nouvelle fonctionnalité
+- `fix` - Correction de bug
+- `docs` - Documentation
+- `style` - Formatage (CSS, JS sans changement de logique)
+- `refactor` - Restructuration du code
+- `test` - Ajout ou modification de tests
+- `chore` - Tâches de maintenance (dépendances, outils, etc.)
+
+**Exemples :**
+
+```
+feat(inventory): add item usage system
+fix(hubspots): resolve visibility condition issue
+docs(readme): update installation instructions
+style(css): improve modal animation
+```
+
+Le scope (`<scope>`) est optionnel et correspond généralement au module concerné (`inventory`, `hubspots`, `canvas`, etc.).
+
+### Génération du CHANGELOG
+
+Le fichier `CHANGELOG.md` est automatiquement mis à jour via le hook `post-commit` après chaque commit valide.
+
+Pour mettre à jour manuellement :
+
+```bash
+pnpm changelog:update
+```
+
+Pour générer un CHANGELOG complet depuis le début :
+
+```bash
+pnpm changelog
+```
+
 ## Liste de vérification des tests
 
 Avant de soumettre une PR, vérifiez :
