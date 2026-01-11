@@ -66,7 +66,7 @@ escape-game-web/
 ├── style.css        # Styles principaux
 ├── index.html       # Fichier HTML d'entrée
 ├── package.json     # Configuration pnpm et scripts
-├── .eslintrc.json   # Configuration ESLint
+├── eslint.config.js # Configuration ESLint
 ├── .prettierrc      # Configuration Prettier
 └── .husky/          # Git hooks (Husky)
 ```
