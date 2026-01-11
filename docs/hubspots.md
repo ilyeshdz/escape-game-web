@@ -1,82 +1,215 @@
 # Hubspots
 
-Les "hubspots" sont les éléments interactifs du jeu. Ils sont définis dans le fichier `data/hubspots.json`.
+Hubspots are the interactive elements of the game. They are defined in the `data/hubspots.json` file.
 
-Chaque hubspot est un objet JSON avec les propriétés suivantes:
+## Basic Structure
 
-- `id` (string, requis): Un identifiant unique pour le hubspot.
-- `type` (string, requis): Le type de hubspot. Voir les types ci-dessous.
-- `visibleIn` (array, requis): Un tableau d'états dans lesquels le hubspot est visible.
-- `x` (number, requis): La position horizontale du hubspot en pourcentage (0-100).
-- `y` (number, requis): La position verticale du hubspot en pourcentage (0-100).
-- `size` (number, optionnel): La taille du hubspot en pixels (défaut: 40).
-- `emoji` (string, optionnel): Un émoji à afficher sur le canvas à la place du cercle blanc.
-- `tooltip` (string, optionnel): Un texte qui s'affiche au survol du hubspot.
-- `isHidden` (boolean, optionnel): Si `true`, le hubspot est invisible mais toujours cliquable.
+Each hubspot is a JSON object with the following properties:
 
-## Affichage des hubspots
+| Property    | Type    | Required | Description                                       |
+| ----------- | ------- | -------- | ------------------------------------------------- |
+| `id`        | string  | Yes      | Unique identifier for the hubspot                 |
+| `type`      | string  | Yes      | Hubspot type (see below)                          |
+| `visibleIn` | array   | Yes      | Array of states where the hubspot is visible      |
+| `x`         | number  | Yes      | Horizontal position as percentage (0-100)         |
+| `y`         | number  | Yes      | Vertical position as percentage (0-100)           |
+| `size`      | number  | No       | Hubspot size in pixels (default: 40)              |
+| `emoji`     | string  | No       | Emoji to display instead of white circle          |
+| `tooltip`   | string  | No       | Text displayed on hover                           |
+| `isHidden`  | boolean | No       | If true, hubspot is invisible but still clickable |
 
-Les hubspots avec la propriété `emoji` sont affichés comme des émojis sur le canvas. Les autres hubspots sont affichés comme des cercles blancs semi-transparents.
+## Hubspot Display
 
-## Types de Hubspot
+Hubspots with the `emoji` property are displayed as emojis on the canvas. Other hubspots are displayed as semi-transparent white circles.
 
-### `modal`
+## Hubspot Types
 
-Affiche une fenêtre modale avec du texte.
+### modal
 
-**Propriétés supplémentaires:**
+Displays a modal window with text.
 
-- `modalText` (string, requis): Le texte à afficher dans la modale (peut contenir du HTML).
+**Additional Properties:**
 
-### `action`
+| Property    | Type   | Required | Description                                     |
+| ----------- | ------ | -------- | ----------------------------------------------- |
+| `modalText` | string | Yes      | Text to display in the modal (can contain HTML) |
 
-Déclenche une action dans la machine à états.
+**Example:**
 
-**Propriétés supplémentaires:**
+```json
+{
+    "id": "note",
+    "type": "modal",
+    "visibleIn": ["room1"],
+    "x": 25,
+    "y": 60,
+    "emoji": "📜",
+    "modalText": "<p>You find a torn note:</p><p><em>The code is 1234</em></p>"
+}
+```
 
-- `action` (string, requis): Le nom de l'action à déclencher.
+### action
 
-### `finish`
+Triggers an action in the state machine.
 
-Termine le jeu (gagné ou perdu).
+**Additional Properties:**
 
-**Propriétés supplémentaires:**
+| Property | Type   | Required | Description                |
+| -------- | ------ | -------- | -------------------------- |
+| `action` | string | Yes      | The action name to trigger |
 
-- `win` (boolean, optionnel): Si `true`, le jeu est gagné. Si `false` ou non défini, le jeu est perdu.
+**Example:**
 
-### `link`
+```json
+{
+    "id": "openDoor",
+    "type": "action",
+    "visibleIn": ["room1"],
+    "x": 80,
+    "y": 50,
+    "emoji": "🚪",
+    "action": "enterCorridor"
+}
+```
 
-Ouvre un lien dans un nouvel onglet.
+### finish
 
-**Propriétés supplémentaires:**
+Ends the game (win or lose).
 
-- `url` (string, requis): L'URL à ouvrir.
+**Additional Properties:**
 
-### `secret`
+| Property | Type    | Required | Description                                               |
+| -------- | ------- | -------- | --------------------------------------------------------- |
+| `win`    | boolean | No       | If true, game is won. If false or undefined, game is lost |
 
-Affiche une modale demandant un code secret.
+**Example (Win):**
 
-**Propriétés supplémentaires:**
+```json
+{
+    "id": "exit",
+    "type": "finish",
+    "visibleIn": ["corridor"],
+    "x": 50,
+    "y": 80,
+    "emoji": "🏆",
+    "win": true
+}
+```
 
-- `prompt` (string, optionnel): Le texte à afficher au-dessus du champ de saisie.
-- `secretCode` (string, requis): Le code secret à entrer.
-- `onSuccess` (object, optionnel): Un objet qui définit ce qui se passe lorsque le code est correct. Peut contenir les mêmes propriétés qu'un hubspot (`type`, `action`, `modalText`, `win`).
+**Example (Lose):**
 
-### `useItem`
+```json
+{
+    "id": "trap",
+    "type": "finish",
+    "visibleIn": ["room2"],
+    "x": 50,
+    "y": 50,
+    "emoji": "💀",
+    "win": false
+}
+```
 
-Permet au joueur d'utiliser un objet sur le hubspot.
+### link
 
-**Propriétés supplémentaires:**
+Opens a URL in a new tab.
 
-- `requireItems` (array, requis): Un tableau d'IDs d'objets qui peuvent être utilisés sur ce hubspot.
-- `noItemMessage` (string, optionnel): Le message à afficher si le joueur n'a pas sélectionné d'objet.
-- `wrongItemMessage` (string, optionnel): Le message à afficher si le joueur utilise le mauvais objet.
-- `action` (string, optionnel): L'action à déclencher si l'objet est utilisé avec succès.
-- `giveFlags` (array, optionnel): Un tableau de "flags" à activer.
+**Additional Properties:**
 
-## Donner des objets au joueur
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `url`    | string | Yes      | URL to open |
 
-Plusieurs types de hubspots peuvent donner des objets au joueur via la propriété `giveItems`:
+**Example:**
+
+```json
+{
+    "id": "clueLink",
+    "type": "link",
+    "visibleIn": ["room1"],
+    "x": 70,
+    "y": 30,
+    "emoji": "🔗",
+    "url": "https://example.com/clue"
+}
+```
+
+### secret
+
+Displays a modal asking for a secret code.
+
+**Additional Properties:**
+
+| Property     | Type   | Required | Description                                       |
+| ------------ | ------ | -------- | ------------------------------------------------- |
+| `prompt`     | string | No       | Text to display above the input field             |
+| `secretCode` | string | Yes      | The secret code to enter                          |
+| `onSuccess`  | object | No       | Object defining what happens when code is correct |
+
+**Example with onSuccess:**
+
+```json
+{
+    "id": "safe",
+    "type": "secret",
+    "visibleIn": ["room1"],
+    "x": 50,
+    "y": 50,
+    "emoji": "🔐",
+    "prompt": "Enter the 4-digit code:",
+    "secretCode": "1234",
+    "onSuccess": {
+        "type": "modal",
+        "modalText": "The safe opens! You find a golden key.",
+        "giveFlags": ["safeOpened"],
+        "giveItems": [
+            {
+                "id": "goldenKey",
+                "name": "Golden Key",
+                "emoji": "🔑",
+                "usable": true,
+                "consumable": true
+            }
+        ]
+    }
+}
+```
+
+### useItem
+
+Allows the player to use an item on the hubspot.
+
+**Additional Properties:**
+
+| Property           | Type   | Required | Description                         |
+| ------------------ | ------ | -------- | ----------------------------------- |
+| `requireItems`     | array  | Yes      | Array of item IDs that can be used  |
+| `noItemMessage`    | string | No       | Message if no item selected         |
+| `wrongItemMessage` | string | No       | Message if wrong item used          |
+| `action`           | string | No       | Action to trigger on successful use |
+| `giveFlags`        | array  | No       | Flags to activate on successful use |
+
+**Example:**
+
+```json
+{
+    "id": "door",
+    "type": "useItem",
+    "visibleIn": ["room1", "corridor"],
+    "x": 85,
+    "y": 50,
+    "emoji": "🚪",
+    "requireItems": ["goldenKey"],
+    "noItemMessage": "You need a key to open this door.",
+    "wrongItemMessage": "This key doesn't fit.",
+    "action": "enterTreasureRoom",
+    "giveFlags": ["doorUnlocked"]
+}
+```
+
+## Giving Items to Players
+
+Multiple hubspot types can give items to the player via the `giveItems` property:
 
 ```json
 {
@@ -84,17 +217,17 @@ Plusieurs types de hubspots peuvent donner des objets au joueur via la propriét
     "type": "modal",
     "visibleIn": ["room1"],
     "emoji": "📦",
-    "modalText": "Vous trouvez un coffre au trésor!",
+    "modalText": "You find a treasure chest!",
     "giveItems": [
         {
             "id": "potion",
-            "name": "Potion de soin",
-            "description": "Restaure 50 points de vie.",
+            "name": "Health Potion",
+            "description": "Restores 50 health points.",
             "emoji": "🧪"
         },
         {
             "id": "goldenKey",
-            "name": "Clé dorée",
+            "name": "Golden Key",
             "emoji": "🔑",
             "usable": true,
             "consumable": true
@@ -103,19 +236,21 @@ Plusieurs types de hubspots peuvent donner des objets au joueur via la propriét
 }
 ```
 
-Chaque objet dans `giveItems` peut contenir toutes les propriétés décrites dans la documentation de l'inventaire.
+Each item in `giveItems` can contain all properties described in the inventory documentation.
 
-## Conditions de visibilité
+## Visibility Conditions
 
-Vous pouvez contrôler la visibilité des hubspots en fonction des flags et des objets.
+You can control hubspot visibility based on flags and items.
 
-### Conditions de Flags
+### Flag Conditions
 
-- `requireFlags`: Le hubspot ne sera visible que si **tous** les flags de la liste sont activés.
-- `requireAnyFlags`: Le hubspot ne sera visible que si **au moins un** des flags de la liste est activé.
-- `requireNotFlags`: Le hubspot ne sera visible que si **aucun** des flags de la liste n'est activé.
+| Condition         | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| `requireFlags`    | Hubspot visible only if **all** flags are active    |
+| `requireAnyFlags` | Hubspot visible if **at least one** flag is active  |
+| `requireNotFlags` | Hubspot visible if **none** of the flags are active |
 
-**Exemple:**
+**Example:**
 
 ```json
 {
@@ -123,12 +258,83 @@ Vous pouvez contrôler la visibilité des hubspots en fonction des flags et des 
     "type": "modal",
     "visibleIn": ["safeOpen"],
     "emoji": "🔓",
-    "requireNotItems": ["goldenKey"],
-    "requireNotFlags": ["keyUsed"],
-    "modalText": "Le coffre s'ouvre! Vous trouvez une clé."
+    "requireNotFlags": ["safeOpened"],
+    "modalText": "The safe opens! You find a key."
 }
 ```
 
-### Conditions d'inventaire
+### Inventory Conditions
 
-Voir la [documentation de l'inventaire](./inventory.md) pour les conditions `requireItems`, `requireAnyItems` et `requireNotItems`.
+See the [inventory documentation](./inventory.md) for `requireItems`, `requireAnyItems`, and `requireNotItems` conditions.
+
+**Example:**
+
+```json
+{
+    "id": "lockedChest",
+    "type": "modal",
+    "visibleIn": ["room2"],
+    "requireNotItems": ["chestKey"],
+    "modalText": "This chest is locked."
+}
+```
+
+## Complete Example
+
+Here's a more complete example showing a room with multiple hubspots:
+
+```json
+[
+    {
+        "id": "door",
+        "type": "action",
+        "visibleIn": ["entrance"],
+        "x": 80,
+        "y": 50,
+        "emoji": "🚪",
+        "action": "enterMainRoom",
+        "requireNotFlags": ["doorUnlocked"]
+    },
+    {
+        "id": "doorOpen",
+        "type": "action",
+        "visibleIn": ["entrance"],
+        "x": 80,
+        "y": 50,
+        "emoji": "🚪",
+        "action": "enterMainRoom",
+        "requireFlags": ["doorUnlocked"]
+    },
+    {
+        "id": "key",
+        "type": "modal",
+        "visibleIn": ["entrance"],
+        "x": 20,
+        "y": 70,
+        "emoji": "🔑",
+        "modalText": "You find a rusty key on the floor.",
+        "giveItems": [
+            {
+                "id": "rustyKey",
+                "name": "Rusty Key",
+                "emoji": "🔑",
+                "usable": true,
+                "consumable": false
+            }
+        ]
+    },
+    {
+        "id": "useKeyOnDoor",
+        "type": "useItem",
+        "visibleIn": ["entrance"],
+        "x": 80,
+        "y": 50,
+        "emoji": "🚪",
+        "requireItems": ["rustyKey"],
+        "noItemMessage": "The door is locked. You need a key.",
+        "wrongItemMessage": "That key doesn't fit this door.",
+        "action": "enterMainRoom",
+        "giveFlags": ["doorUnlocked"]
+    }
+]
+```

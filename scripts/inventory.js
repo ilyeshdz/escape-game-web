@@ -92,6 +92,10 @@ export function hasNoneOfItems(itemIds) {
     return itemIds.every((itemId) => !hasItem(itemId));
 }
 
+export function getInventory() {
+    return inventory;
+}
+
 export function getItem(itemId) {
     return inventory.find((item) => item.id === itemId) || null;
 }

@@ -1,52 +1,78 @@
 # Getting Started
 
-Ce guide vous expliquera comment personnaliser le jeu d'évasion.
+This guide explains how to set up and customize the escape game engine.
 
-## Prérequis
+## Prerequisites
 
-- Un navigateur web moderne (Chrome, Firefox, Edge, etc.).
-- Un éditeur de texte (VS Code, Sublime Text, etc.).
-- [pnpm](https://pnpm.io/) (optionnel, pour les outils de qualité de code)
+- A modern web browser (Chrome, Firefox, Edge, Safari)
+- A text editor (VS Code, Sublime Text, etc.)
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [pnpm](https://pnpm.io/) (recommended) or npm
 
 ## Installation
 
 ```bash
-# Installer pnpm si nécessaire
+# Install pnpm if needed
 npm install -g pnpm
 
-# Installer les dépendances de développement
+# Install development dependencies
 pnpm install
+
+# Start the development server
+pnpm dev
 ```
 
-## Structure du projet
+The development server will start at `http://localhost:3000`. Open this URL in your browser to test the game.
 
-Le projet est structuré comme suit:
+## Project Structure
 
-- `index.html`: Le point d'entrée de l'application.
-- `style.css`: Les styles CSS pour l'application.
-- `assets/`: Contient les images et autres ressources.
-- `data/`: Contient les fichiers de configuration JSON.
-- `scripts/`: Contient le code JavaScript de l'application.
-- `docs/`: Contient la documentation.
+```
+escape-game-web/
+├── assets/          # Game images and resources
+├── data/            # JSON configuration files
+│   ├── gameConfig.json    # State machine configuration
+│   └── hubspots.json      # Interactive elements
+├── docs/            # Documentation
+│   ├── getting-started.md
+│   ├── hubspots.md
+│   ├── inventory.md
+│   ├── flags.md
+│   └── statemachine.md
+├── scripts/         # JavaScript modules
+│   ├── canvasScene.js    # Canvas rendering
+│   ├── flags.js          # Flags system
+│   ├── hubspots.js       # Hubspot handlers
+│   ├── hubspotsData.js   # Hubspot loading
+│   ├── inventory.js      # Inventory system
+│   ├── resizeHandler.js  # Responsive handling
+│   ├── script.js         # Main entry point
+│   └── stateMachine.js   # State machine
+├── style.css        # Main styles
+├── index.html       # Entry HTML file
+├── package.json     # pnpm configuration and scripts
+├── eslint.config.js # ESLint configuration
+├── .prettierrc      # Prettier configuration
+└── .husky/          # Git hooks (Husky)
+```
 
-## Personnalisation
+## Customization
 
-La personnalisation du jeu se fait principalement en modifiant les fichiers JSON dans le dossier `data`.
+Game customization is primarily done by modifying JSON files in the `data/` folder.
 
-Pour une documentation détaillée sur chaque partie du moteur de jeu, veuillez consulter les fichiers suivants:
+For detailed documentation on each part of the game engine, see:
 
-- [**Machine à états (`statemachine.md`)**](./statemachine.md): Pour comprendre comment gérer les états et les transitions du jeu.
-- [**Hubspots (`hubspots.md`)**](./hubspots.md): Pour apprendre à créer et configurer les zones interactives.
-- [**Inventaire (`inventory.md`)**](./inventory.md): Pour gérer les objets que le joueur peut collecter et utiliser.
-- [**Flags (`flags.md`)**](./flags.md): Pour utiliser des variables afin de contrôler la visibilité et le comportement des hubspots.
+- [State Machine](./statemachine.md) - Understanding states and transitions
+- [Hubspots](./hubspots.md) - Creating interactive elements
+- [Inventory](./inventory.md) - Managing collectible items
+- [Flags](./flags.md) - Using variables to control hubspot visibility
 
-### Changer l'image de fond
+### Changing the Background Image
 
-Pour changer l'image de fond, remplacez le fichier `assets/scene1.png` par votre propre image. Vous pouvez également modifier le nom du fichier dans `index.html` si vous le souhaitez.
+To change the background image, replace `assets/scene1.png` with your own image. You can also modify the filename in `index.html`.
 
-### Personnaliser l'apparence des hubspots
+### Customizing Hubspot Appearance
 
-Les hubspots peuvent afficher des émojis au lieu de cercles blancs. Ajoutez simplement la propriété `emoji` à un hubspot:
+Hubspots can display emojis instead of white circles. Simply add the `emoji` property to a hubspot:
 
 ```json
 {
@@ -56,25 +82,42 @@ Les hubspots peuvent afficher des émojis au lieu de cercles blancs. Ajoutez sim
     "emoji": "📦",
     "x": 50,
     "y": 50,
-    "modalText": "Un coffre au trésor!"
+    "modalText": "A treasure chest!"
 }
 ```
 
-## Lancer le jeu
+## Running the Game
 
-Pour jouer, ouvrez simplement le fichier `index.html` dans votre navigateur.
-
-## Outils de développement
-
-Ce projet utilise des outils pour maintenir la qualité du code :
+Start the development server:
 
 ```bash
-# Vérifier le code avec ESLint
+pnpm dev
+```
+
+Then open `http://localhost:3000` in your browser.
+
+## Development Tools
+
+This project uses tools to maintain code quality:
+
+```bash
+# Check code with ESLint
 pnpm lint
 
-# Corriger automatiquement les erreurs ESLint
+# Automatically fix ESLint errors
 pnpm lint:fix
 
-# Formater le code avec Prettier
+# Format code with Prettier
 pnpm format
+
+# Check formatting without modifying
+pnpm format:check
 ```
+
+## Next Steps
+
+1. Read the [State Machine](./statemachine.md) documentation to understand game progression
+2. Learn about [Hubspots](./hubspots.md) to create interactive elements
+3. Explore the [Inventory](./inventory.md) system for item management
+4. Use [Flags](./flags.md) to track player progress
+5. Customize the game by editing the JSON files in `data/`
