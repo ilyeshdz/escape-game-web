@@ -410,89 +410,76 @@ Utilisé quand un bug critique est trouvé en production (branche `main`)
 
 ---
 
-#### Workflow 8 : Créer une Release
+#### Workflow 8 : Créer une Release (Semantic Release)
+
+Ce projet utilise **Semantic Release** pour automatiser les releases.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ 1. PRÉPARER LA RELEASE                                           │
-│ - S'assurer que toutes les fonctionnalités sont dans dev        │
-│ - Faire tous les tests                                           │
-│ - Décider du numéro de version (MAJOR.MINOR.PATCH)              │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ 2. CRÉER BRANCHE DE RELEASE                                      │
+│ 1. FUSIONNER DANS MAIN                                          │
 ├─────────────────────────────────────────────────────────────────┤
-│ git checkout dev                                                 │
-│ git pull origin dev                                              │
-│ git checkout -b release/1.2.0                                   │
+│ - Toutes les fonctionnalités sont dans dev                      │
+│ - La PR release/x.y.z est mergée dans main                      │
+│ - Le workflow Release se déclenche automatiquement              │
 └─────────────────────────────────────────────────────────────────┘
-                              ↓
+                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ 3. PRÉPARATION RELEASE (sur la branche release)                  │
+│ 2. SEMANTIC RELEASE ANALYSE LES COMMITS                        │
 ├─────────────────────────────────────────────────────────────────┤
-│ - Corrections de bugs FINALES UNIQUEMENT                         │
-│ - Exécuter pnpm lint:fix && pnpm format                          │
-│ - Mettre à jour la version dans package.json                     │
-│ - Mettre à jour CHANGELOG.md avec les notes de release           │
-│ - Tester minutieusement                                          │
+│ - Analyse les messages de commit                                │
+│ - Détermine le type de version (MAJOR.MINOR.PATCH)             │
+│ - Génère le CHANGELOG automatiquement                           │
+│ - Met à jour package.json et CHANGELOG.md                       │
+│ - Crée la release GitHub avec les assets                        │
 └─────────────────────────────────────────────────────────────────┘
-                              ↓
+                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ 4. COMMIT DES CHANGEMENTS DE RELEASE                             │
+│ 3. SYNCHRONISER DEV                                             │
 ├─────────────────────────────────────────────────────────────────┤
-│ git add .                                                        │
-│ git commit -m "release: prepare v1.2.0"                         │
-│ git push origin release/1.2.0                                    │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ 5. CRÉER RELEASE PR                                              │
-│ # Créer PR : release/1.2.0 → main                                │
-│ # Inclure :                                                       │
-│   - Résumé des changements de version                            │
-│   - Entries du Changelog                                         │
-│   - Notes de test                                                │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ 6. APRÈS LE MERGE DANS MAIN                                      │
-├─────────────────────────────────────────────────────────────────┤
-│ # Créer la release GitHub avec le tag                            │
-│ # Sur GitHub : Releases → Draft new release                      │
-│ # Tag: v1.2.0                                                    │
-│ # Title: Release v1.2.0                                          │
-│ # Description: Copier depuis CHANGELOG.md                        │
-│                                                                 │
-│ # Synchroniser dev avec main :                                   │
 │ git checkout dev                                                 │
 │ git merge main                                                   │
 │ git push origin dev                                              │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+**Avantages de Semantic Release :**
+
+- Version automatique basée sur les commits
+- CHANGELOG généré automatiquement
+- Pas de manipulation manuelle de version
+- Tags créés automatiquement
+
+**Types de commits et impact sur la version :**
+
+| Type de commit | Incrément | Exemple     |
+| -------------- | --------- | ----------- |
+| `feat`         | MINOR     | 1.0 → 1.1   |
+| `fix`          | PATCH     | 1.1 → 1.1.1 |
+| `feat!:`       | MAJOR     | 1.x → 2.0   |
+| `break!:`      | MAJOR     | 1.x → 2.0   |
+
 **Règles de la branche release :**
 
 - ✅ Corrections de bugs
 - ✅ Améliorations de formatage
 - ✅ Mises à jour de documentation
-- ✅ Mises à jour de version
-- ❌ Nouvelles fonctionnalités
-- ❌ Refactorisations
-- ❌ Breaking changes
+- ✅ Nouvelles fonctionnalités (annonçant une MINOR)
+- ❌ Breaking changes (sauf préparation MAJOR)
 
 ---
 
 #### Guide de décision pour les versions
 
-| Type de changement            | Incrément | Exemple     |
-| ----------------------------- | --------- | ----------- |
-| Nouvelle salle/puzzle         | MINOR     | 1.0 → 1.1   |
-| Nouveau mécanisme de jeu      | MINOR     | 1.0 → 1.1   |
-| Correction de bug             | PATCH     | 1.1 → 1.1.1 |
-| Amélioration performance      | PATCH     | 1.1 → 1.1.1 |
-| Amélioration visuelle/UI      | PATCH     | 1.1 → 1.1.1 |
-| Breaking change (format save) | MAJOR     | 1.x → 2.0   |
+Semantic Release détermine automatiquement la version en analysant vos commits.
+
+| Type de changement            | Type de commit  | Incrément |
+| ----------------------------- | --------------- | --------- |
+| Nouvelle salle/puzzle         | `feat`          | MINOR     |
+| Nouveau mécanisme de jeu      | `feat`          | MINOR     |
+| Correction de bug             | `fix`           | PATCH     |
+| Amélioration performance      | `fix` ou `perf` | PATCH     |
+| Amélioration visuelle/UI      | `style`         | PATCH     |
+| Breaking change (format save) | `feat!`         | MAJOR     |
 
 ---
 
@@ -507,7 +494,7 @@ Utilisé quand un bug critique est trouvé en production (branche `main`)
 | Refactorer       | dev        | `refactor/xxx`  | `refactor:` | dev        |
 | Maintenance      | dev        | `chore/xxx`     | `chore:`    | dev        |
 | Hotfix release   | main       | `hotfix/xxx`    | `fix:`      | main → dev |
-| Préparer release | dev        | `release/x.y.z` | `release:`  | main       |
+| Préparer release | dev        | `release/x.y.z` | `feat:`     | main       |
 
 ### 5. Tester vos modifications
 
@@ -612,19 +599,21 @@ Le scope (`<scope>`) est optionnel et correspond généralement au module concer
 
 ### Génération du CHANGELOG
 
-Le fichier `CHANGELOG.md` est automatiquement mis à jour via le hook `post-commit` après chaque commit valide.
+Le CHANGELOG est **généré automatiquement** par Semantic Release lors de chaque release.
 
-Pour mettre à jour manuellement :
-
-```bash
-pnpm changelog:update
-```
-
-Pour générer un CHANGELOG complet depuis le début :
+Vous n'avez besoin de le générer manuellement que pour consultation :
 
 ```bash
 pnpm changelog
 ```
+
+Pour visualiser les changements sans écrire dans le fichier :
+
+```bash
+pnpm changelog --dry-run
+```
+
+**Note :** Ne modifiez jamais manuellement le CHANGELOG. Semantic Release le met à jour automatiquement lors des releases.
 
 ## Liste de vérification des tests
 
