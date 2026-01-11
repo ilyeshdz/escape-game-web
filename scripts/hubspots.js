@@ -4,6 +4,7 @@ import { setFlag, unsetFlag, checkCondition } from './flags.js';
 import { addItem, removeItem, getSelectedItemObject } from './inventory.js';
 import { checkInventoryCondition } from './inventory.js';
 import { updateHubspots as updateCanvasHubspots } from './canvasScene.js';
+import { showHubspotNotification } from './toast.js';
 
 let hubspotsData = [];
 let activeHubspots = [];
@@ -25,7 +26,6 @@ function executeHubspotActions(hubspotData) {
     if (hubspotData.giveItems) {
         hubspotData.giveItems.forEach((item) => {
             if (addItem(item)) {
-                announce(`Objet ajouté: ${item.name}`);
                 if (item.pickupMessage) {
                     setTimeout(() => showModal(item.pickupMessage), 100);
                 }
@@ -35,19 +35,16 @@ function executeHubspotActions(hubspotData) {
     if (hubspotData.giveFlags) {
         hubspotData.giveFlags.forEach((flag) => {
             setFlag(flag);
-            announce(`État changé: ${flag}`);
         });
     }
     if (hubspotData.removeFlags) {
         hubspotData.removeFlags.forEach((flag) => {
             unsetFlag(flag);
-            announce(`État terminé: ${flag}`);
         });
     }
     if (hubspotData.removeItems) {
         hubspotData.removeItems.forEach((itemId) => {
             removeItem(itemId);
-            announce(`Objet utilisé et retiré`);
         });
     }
 }
@@ -57,6 +54,7 @@ function handleAreaAction(hubspotData) {
     if (hubspotData.url) window.open(hubspotData.url, '_blank');
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
         executeHubspotActions(hubspotData);
+        showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
         if (hubspotData.win !== undefined) {
             showFinish(hubspotData.win);
@@ -65,14 +63,22 @@ function handleAreaAction(hubspotData) {
 }
 
 function handleModalAction(hubspotData) {
-    showModal(hubspotData.modalText || '');
-    executeHubspotActions(hubspotData);
-    updateHubspotsVisibility();
+    if (hubspotData.notificationMessage) {
+        executeHubspotActions(hubspotData);
+        showHubspotNotification(hubspotData);
+        updateHubspotsVisibility();
+    } else {
+        showModal(hubspotData.modalText || '');
+        executeHubspotActions(hubspotData);
+        showHubspotNotification(hubspotData);
+        updateHubspotsVisibility();
+    }
 }
 
 function handleAction(hubspotData) {
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
         executeHubspotActions(hubspotData);
+        showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
 }
@@ -80,6 +86,7 @@ function handleAction(hubspotData) {
 function handleFinishAction(hubspotData) {
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
         executeHubspotActions(hubspotData);
+        showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
     showFinish(hubspotData.win !== undefined ? hubspotData.win : true);
@@ -103,6 +110,7 @@ function handleUseItem(hubspotData) {
     }
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
         executeHubspotActions(hubspotData);
+        showHubspotNotification(hubspotData);
         if (selectedItem.consumable) {
             removeItem(selectedItem.id);
         }
