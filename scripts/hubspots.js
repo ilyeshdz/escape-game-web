@@ -5,6 +5,7 @@ import { addItem, removeItem, getSelectedItemObject } from './inventory.js';
 import { checkInventoryCondition } from './inventory.js';
 import { updateHubspots as updateCanvasHubspots } from './canvasScene.js';
 import { showHubspotNotification } from './toast.js';
+import { getItemTemplate } from './items.js';
 
 let hubspotsData = [];
 let activeHubspots = [];
@@ -22,15 +23,51 @@ const hubspotHandlers = {
     useItem: handleUseItem
 };
 
-function executeHubspotActions(hubspotData) {
+async function resolveItem(itemDefinition) {
+    if (itemDefinition.itemId) {
+        const template = await getItemTemplate(itemDefinition.itemId);
+        if (!template) {
+            /* eslint-disable no-console */
+            console.warn(`Item not found in central definitions: ${itemDefinition.itemId}`);
+            /* eslint-enable no-console */
+            return null;
+        }
+        return {
+            ...template,
+            ...itemDefinition,
+            id: itemDefinition.itemId
+        };
+    }
+    if (itemDefinition.id) {
+        return itemDefinition;
+    }
+    return null;
+}
+
+async function resolveGiveItems(giveItems) {
+    if (!giveItems || !Array.isArray(giveItems)) {
+        return [];
+    }
+    const resolved = [];
+    for (const itemDef of giveItems) {
+        const resolvedItem = await resolveItem(itemDef);
+        if (resolvedItem) {
+            resolved.push(resolvedItem);
+        }
+    }
+    return resolved;
+}
+
+async function executeHubspotActions(hubspotData) {
     if (hubspotData.giveItems) {
-        hubspotData.giveItems.forEach((item) => {
+        const resolvedItems = await resolveGiveItems(hubspotData.giveItems);
+        for (const item of resolvedItems) {
             if (addItem(item)) {
                 if (item.pickupMessage) {
                     setTimeout(() => showModal(item.pickupMessage), 100);
                 }
             }
-        });
+        }
     }
     if (hubspotData.giveFlags) {
         hubspotData.giveFlags.forEach((flag) => {
@@ -49,11 +86,11 @@ function executeHubspotActions(hubspotData) {
     }
 }
 
-function handleAreaAction(hubspotData) {
+async function handleAreaAction(hubspotData) {
     if (hubspotData.modalText) showModal(hubspotData.modalText);
     if (hubspotData.url) window.open(hubspotData.url, '_blank');
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
         if (hubspotData.win !== undefined) {
@@ -62,30 +99,30 @@ function handleAreaAction(hubspotData) {
     }
 }
 
-function handleModalAction(hubspotData) {
+async function handleModalAction(hubspotData) {
     if (hubspotData.notificationMessage) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     } else {
         showModal(hubspotData.modalText || '');
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
 }
 
-function handleAction(hubspotData) {
+async function handleAction(hubspotData) {
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
 }
 
-function handleFinishAction(hubspotData) {
+async function handleFinishAction(hubspotData) {
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
@@ -242,7 +279,7 @@ const secretError = document.getElementById('secret-error');
 const secretSubmit = document.getElementById('secret-submit');
 const secretCancel = document.getElementById('secret-cancel');
 
-function checkSecret() {
+async function checkSecret() {
     if (!currentSecretHubspotData) return;
 
     const inputValue = secretInput.value.trim();
@@ -256,13 +293,13 @@ function checkSecret() {
                     break;
                 case 'action':
                     if (action && getStateMachine().transition(action)) {
-                        executeHubspotActions(currentSecretHubspotData);
+                        await executeHubspotActions(currentSecretHubspotData);
                         updateHubspotsVisibility();
                     }
                     break;
                 case 'finish':
                     if (action && getStateMachine().transition(action)) {
-                        executeHubspotActions(currentSecretHubspotData);
+                        await executeHubspotActions(currentSecretHubspotData);
                         updateHubspotsVisibility();
                     }
                     showFinish(win !== undefined ? win : true);
@@ -272,7 +309,7 @@ function checkSecret() {
                         currentSecretHubspotData.action &&
                         getStateMachine().transition(currentSecretHubspotData.action)
                     ) {
-                        executeHubspotActions(currentSecretHubspotData);
+                        await executeHubspotActions(currentSecretHubspotData);
                         updateHubspotsVisibility();
                     }
             }
@@ -280,7 +317,7 @@ function checkSecret() {
             currentSecretHubspotData.action &&
             getStateMachine().transition(currentSecretHubspotData.action)
         ) {
-            executeHubspotActions(currentSecretHubspotData);
+            await executeHubspotActions(currentSecretHubspotData);
             updateHubspotsVisibility();
         }
     } else {
