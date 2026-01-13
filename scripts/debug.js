@@ -20,6 +20,7 @@ import { getStateMachine } from './stateMachine.js';
 import { updateHubspotsVisibility } from './hubspots.js';
 import { addItem, hasItem, clearInventory } from './inventory.js';
 import { setFlag, unsetFlag, getFlags } from './flags.js';
+import { getItemTemplate, getAvailableItems } from './items.js';
 
 let debugPanelVisible = false;
 let consoleCommandsEnabled = false;
@@ -171,7 +172,7 @@ function processConsoleInput(input) {
     executeCommand(command, arg);
 }
 
-export function executeCommand(command, arg = '') {
+export async function executeCommand(command, arg = '') {
     if (!DEBUG_ENABLED) {
         console.warn('Debug mode is disabled');
         return false;
@@ -188,11 +189,16 @@ export function executeCommand(command, arg = '') {
         case '/give':
         case 'give':
             if (arg) {
-                spawnItem(arg);
+                await spawnItem(arg);
                 return true;
             }
             console.warn('Usage: /spawn <item-id>');
             return false;
+
+        case '/items':
+        case 'items':
+            await listItems();
+            return true;
 
         case '/clear':
         case 'clear':
@@ -260,24 +266,38 @@ function skipLevel() {
     }
 }
 
-function spawnItem(itemId) {
+async function spawnItem(itemId) {
     if (hasItem(itemId)) {
         console.warn(`Item already in inventory: ${itemId}`);
         return;
     }
 
+    const template = await getItemTemplate(itemId);
+    if (!template) {
+        console.warn(
+            `Unknown item: ${itemId}. Available items: goldenKey, potion, scroll, gem, apple`
+        );
+        return;
+    }
+
     const item = {
-        id: itemId,
-        name: itemId,
-        description: `Debug item: ${itemId}`,
-        emoji: '🎁'
+        ...template
     };
 
     if (addItem(item)) {
-        console.log(`%cSpawned item: ${itemId}`, 'color: lime');
+        console.log(`%cSpawned item: ${template.name}`, 'color: lime');
     } else {
         console.warn('Inventory is full or item could not be added');
     }
+}
+
+async function listItems() {
+    const items = await getAvailableItems();
+    console.log('%c=== Available Items ===', 'color: yellow; font-weight: bold;');
+    items.forEach((item) => {
+        console.log(`${item.emoji} ${item.id} - ${item.name} [${item.category}]`);
+    });
+    console.log('%cUse /spawn <item-id> to add an item', 'color: cyan');
 }
 
 function clearInventoryDebug() {
@@ -316,6 +336,7 @@ function showDebugHelp() {
     console.log('%c=== Debug Commands ===', 'color: yellow; font-weight: bold;');
     console.log('/skip - Skip current level/state');
     console.log('/spawn <id> - Add item to inventory');
+    console.log('/items - List all available items');
     console.log('/clear - Clear inventory');
     console.log('/flags - List active flags');
     console.log('/setflag <name> - Set a flag');
