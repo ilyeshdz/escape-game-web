@@ -6,14 +6,40 @@ let hoveredHubspotId = null;
 let focusedHubspotIndex = -1;
 let isKeyboardNavigating = false;
 
-export function initCanvasScene(canvasElement, imagePath, hubspotsData) {
+/**
+ * Initializes the canvas scene with scene management
+ * @param {HTMLCanvasElement} canvasElement - Canvas element to initialize
+ * @param {Object} sceneConfig - Scene configuration object with backgroundImage property
+ * @param {Array} hubspotsData - Array of hubspot data
+ */
+export function initCanvasScene(canvasElement, sceneConfig, hubspotsData) {
     canvas = canvasElement;
     ctx = canvas.getContext('2d');
     hubspots = hubspotsData;
 
+    const imagePath = sceneConfig?.backgroundImage || 'assets/scene1.png';
     loadSceneImage(imagePath);
     setupEventListeners();
     requestAnimationFrame(renderLoop);
+}
+
+/**
+ * Loads a scene by its configuration
+ * @param {Object} sceneConfig - Scene configuration object
+ */
+export function loadScene(sceneConfig) {
+    if (!sceneConfig) return;
+
+    const imagePath = sceneConfig.backgroundImage || 'assets/scene1.png';
+    loadSceneImage(imagePath);
+}
+
+/**
+ * Gets the current scene image
+ * @returns {Image} Current scene image object
+ */
+export function getSceneImage() {
+    return sceneImage;
 }
 
 function loadSceneImage(path) {

@@ -1,0 +1,17 @@
+{
+  "scenes": [
+    {
+      "id": "foyer",
+      "backgroundImage": "assets/scene1.png",
+      "default": true
+    },
+    {
+      "id": "library",
+      "backgroundImage": "assets/scene1.png"
+    },
+    {
+      "id": "garden",
+      "backgroundImage": "assets/scene1.png"
+    }
+  ]
+}
