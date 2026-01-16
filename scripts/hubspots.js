@@ -3,7 +3,7 @@ import { loadHubspotsData } from './hubspotsData.js';
 import { setFlag, unsetFlag, checkCondition } from './flags.js';
 import { addItem, removeItem, getSelectedItemObject } from './inventory.js';
 import { checkInventoryCondition } from './inventory.js';
-import { updateHubspots as updateCanvasHubspots } from './canvasScene.js';
+import { updateHubspots as updateCanvasHubspots, loadScene } from './canvasScene.js';
 import { showHubspotNotification } from './toast.js';
 import { getItemTemplate } from './items.js';
 
@@ -20,7 +20,8 @@ const hubspotHandlers = {
     finish: handleFinishAction,
     link: handleLinkAction,
     secret: showSecretInput,
-    useItem: handleUseItem
+    useItem: handleUseItem,
+    scene: handleSceneTransition
 };
 
 async function resolveItem(itemDefinition) {
@@ -155,6 +156,44 @@ function handleUseItem(hubspotData) {
     }
 }
 
+/**
+ * Handles scene transition hubspot clicks
+ * @param {Object} hubspotData - Hubspot configuration data
+ */
+async function handleSceneTransition(hubspotData) {
+    const targetScene = hubspotData.targetScene;
+    if (!targetScene) {
+        /* eslint-disable no-console */
+        console.warn('Scene transition hubspot missing targetScene property');
+        /* eslint-enable no-console */
+        return;
+    }
+
+    // Attempt to transition to the target scene
+    if (getStateMachine().transitionToScene(targetScene)) {
+        // Execute any actions defined on the hubspot
+        await executeHubspotActions(hubspotData);
+
+        // Load the new scene background
+        const sceneConfig = getStateMachine().getSceneConfig(targetScene);
+        if (sceneConfig) {
+            loadScene(sceneConfig);
+        }
+
+        // Show notification if defined
+        if (hubspotData.notificationMessage) {
+            showHubspotNotification(hubspotData);
+        }
+
+        // Update hubspots visibility for the new scene
+        updateHubspotsVisibility();
+    } else {
+        showModal(
+            hubspotData.blockedMessage || 'Vous ne pouvez pas accéder à cet endroit pour le moment.'
+        );
+    }
+}
+
 export async function setupHubspots() {
     hubspotsData = await loadHubspotsData();
     if (hubspotsData.length === 0) {
@@ -169,10 +208,16 @@ export function getHubspots() {
 
 export function updateHubspotsVisibility() {
     const currentState = getStateMachine().getState();
+    const currentScene = getStateMachine().getScene();
 
     activeHubspots = hubspotsData
         .map((hubspotData) => {
-            const isVisibleInState = hubspotData.visibleIn.includes(currentState);
+            // Check scene visibility if visibleInScenes is specified
+            const isVisibleInScene =
+                !hubspotData.visibleInScenes || hubspotData.visibleInScenes.includes(currentScene);
+
+            const isVisibleInState =
+                !hubspotData.visibleIn || hubspotData.visibleIn.includes(currentState);
             const meetsConditions =
                 checkCondition({
                     requireFlags: hubspotData.requireFlags,
@@ -185,7 +230,7 @@ export function updateHubspotsVisibility() {
                     requireNotItems: hubspotData.requireNotItems
                 });
 
-            if (isVisibleInState && meetsConditions) {
+            if (isVisibleInScene && isVisibleInState && meetsConditions) {
                 return {
                     ...hubspotData,
                     onClick: (hubspot) => {

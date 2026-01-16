@@ -38,7 +38,11 @@ async function init() {
 
     const canvas = document.getElementById('game-canvas');
     const activeHubspots = getHubspots();
-    initCanvasScene(canvas, './assets/scene1.png', activeHubspots);
+
+    // Get current scene configuration and initialize canvas
+    const stateMachine = getStateMachine();
+    const currentSceneConfig = stateMachine.getSceneConfig(stateMachine.getScene());
+    initCanvasScene(canvas, currentSceneConfig, activeHubspots);
 
     if (isDebugEnabled()) {
         initDebugMode();

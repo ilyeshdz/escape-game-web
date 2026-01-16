@@ -105,5 +105,79 @@
     "tooltip": "Sortir",
     "action": "escape",
     "win": true
+  },
+  {
+    "id": "toLibrary",
+    "x": 30,
+    "y": 10,
+    "type": "scene",
+    "visibleInScenes": ["foyer"],
+    "visibleIn": ["room1", "safeOpen", "finished"],
+    "targetScene": "library",
+    "emoji": "📚",
+    "tooltip": "Aller à la bibliothèque",
+    "notificationMessage": "Vous entrez dans la bibliothèque",
+    "notificationType": "info"
+  },
+  {
+    "id": "toGarden",
+    "x": 70,
+    "y": 10,
+    "type": "scene",
+    "visibleInScenes": ["foyer"],
+    "visibleIn": ["room1", "safeOpen", "finished"],
+    "targetScene": "garden",
+    "emoji": "🌳",
+    "tooltip": "Aller au jardin",
+    "notificationMessage": "Vous sortez dans le jardin",
+    "notificationType": "info"
+  },
+  {
+    "id": "toFoyerFromLibrary",
+    "x": 10,
+    "y": 50,
+    "type": "scene",
+    "visibleInScenes": ["library"],
+    "visibleIn": ["room1", "safeOpen", "finished"],
+    "targetScene": "foyer",
+    "emoji": "🚪",
+    "tooltip": "Retour au hall d'entrée",
+    "notificationMessage": "Vous revenez dans le hall d'entrée",
+    "notificationType": "info"
+  },
+  {
+    "id": "toFoyerFromGarden",
+    "x": 10,
+    "y": 50,
+    "type": "scene",
+    "visibleInScenes": ["garden"],
+    "visibleIn": ["room1", "safeOpen", "finished"],
+    "targetScene": "foyer",
+    "emoji": "🚪",
+    "tooltip": "Retour au hall d'entrée",
+    "notificationMessage": "Vous revenez dans le hall d'entrée",
+    "notificationType": "info"
+  },
+  {
+    "id": "libraryBook",
+    "x": 50,
+    "y": 50,
+    "type": "modal",
+    "visibleInScenes": ["library"],
+    "visibleIn": ["room1", "safeOpen", "finished"],
+    "emoji": "📖",
+    "tooltip": "Livre ancien",
+    "modalText": "Vous trouvez un livre ancien contenant des indices sur l'histoire de cette maison."
+  },
+  {
+    "id": "gardenFountain",
+    "x": 50,
+    "y": 50,
+    "type": "modal",
+    "visibleInScenes": ["garden"],
+    "visibleIn": ["room1", "safeOpen", "finished"],
+    "emoji": "⛲",
+    "tooltip": "Fontaine",
+    "modalText": "Une belle fontaine ancienne. Vous remarquez quelque chose qui brille au fond de l'eau..."
   }
 ]

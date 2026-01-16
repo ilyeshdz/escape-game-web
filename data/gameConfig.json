@@ -1,5 +1,18 @@
 {
   "initialState": "room1",
+  "initialScene": "foyer",
+  "sceneTransitions": {
+    "foyer": {
+      "toLibrary": "library",
+      "toGarden": "garden"
+    },
+    "library": {
+      "toFoyer": "foyer"
+    },
+    "garden": {
+      "toFoyer": "foyer"
+    }
+  },
   "initialFlags": {},
   "transitions": {
     "room1": {
