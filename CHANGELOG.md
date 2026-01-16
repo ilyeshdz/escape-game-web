@@ -1,3 +1,49 @@
+## <small>1.2.1 (2026-01-16)</small>
+
+- chore: update changelog for v1.4.0 release ([6059a61](https://github.com/ilyeshdz/escape-game-web/commit/6059a61))
+- feat: Add inventory hover tooltip with item details ([c99f885](https://github.com/ilyeshdz/escape-game-web/commit/c99f885))
+- feat: add multi-scene support for multi-room escape games (#25) ([5291426](https://github.com/ilyeshdz/escape-game-web/commit/5291426)), closes [#25](https://github.com/ilyeshdz/escape-game-web/issues/25) [#13](https://github.com/ilyeshdz/escape-game-web/issues/13)
+- feat: Add startup validation for item references ([5691726](https://github.com/ilyeshdz/escape-game-web/commit/5691726)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Create centralized item definitions system ([2a90677](https://github.com/ilyeshdz/escape-game-web/commit/2a90677)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Integrate itemId references in hubspots ([7fe8b35](https://github.com/ilyeshdz/escape-game-web/commit/7fe8b35)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Update debug spawn command to use centralized items ([6b8f9b7](https://github.com/ilyeshdz/escape-game-web/commit/6b8f9b7)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- docs: Document new centralized item system ([dbbdf67](https://github.com/ilyeshdz/escape-game-web/commit/dbbdf67)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+
+### BREAKING CHANGE
+
+- release prep
+
+## <small>1.2.1 (2026-01-16)</small>
+
+- feat: Add inventory hover tooltip with item details ([c99f885](https://github.com/ilyeshdz/escape-game-web/commit/c99f885))
+- feat: add multi-scene support for multi-room escape games (#25) ([5291426](https://github.com/ilyeshdz/escape-game-web/commit/5291426)), closes [#25](https://github.com/ilyeshdz/escape-game-web/issues/25) [#13](https://github.com/ilyeshdz/escape-game-web/issues/13)
+- feat: Add startup validation for item references ([5691726](https://github.com/ilyeshdz/escape-game-web/commit/5691726)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Create centralized item definitions system ([2a90677](https://github.com/ilyeshdz/escape-game-web/commit/2a90677)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Integrate itemId references in hubspots ([7fe8b35](https://github.com/ilyeshdz/escape-game-web/commit/7fe8b35)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Update debug spawn command to use centralized items ([6b8f9b7](https://github.com/ilyeshdz/escape-game-web/commit/6b8f9b7)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- docs: Document new centralized item system ([dbbdf67](https://github.com/ilyeshdz/escape-game-web/commit/dbbdf67)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+
+## <small>1.2.1 (2026-01-16)</small>
+
+- docs: add multi-scene documentation ([7bdb7ea](https://github.com/ilyeshdz/escape-game-web/commit/7bdb7ea))
+- docs: Document new centralized item system ([dbbdf67](https://github.com/ilyeshdz/escape-game-web/commit/dbbdf67)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Add inventory hover tooltip with item details ([c99f885](https://github.com/ilyeshdz/escape-game-web/commit/c99f885))
+- feat: add multi-scene support for multi-room escape games ([5f1d449](https://github.com/ilyeshdz/escape-game-web/commit/5f1d449)), closes [#13](https://github.com/ilyeshdz/escape-game-web/issues/13)
+- feat: Add startup validation for item references ([5691726](https://github.com/ilyeshdz/escape-game-web/commit/5691726)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Create centralized item definitions system ([2a90677](https://github.com/ilyeshdz/escape-game-web/commit/2a90677)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Integrate itemId references in hubspots ([7fe8b35](https://github.com/ilyeshdz/escape-game-web/commit/7fe8b35)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Update debug spawn command to use centralized items ([6b8f9b7](https://github.com/ilyeshdz/escape-game-web/commit/6b8f9b7)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+
+## <small>1.2.1 (2026-01-16)</small>
+
+- feat: Add inventory hover tooltip with item details ([c99f885](https://github.com/ilyeshdz/escape-game-web/commit/c99f885))
+- feat: add multi-scene support for multi-room escape games ([5f1d449](https://github.com/ilyeshdz/escape-game-web/commit/5f1d449)), closes [#13](https://github.com/ilyeshdz/escape-game-web/issues/13)
+- feat: Add startup validation for item references ([5691726](https://github.com/ilyeshdz/escape-game-web/commit/5691726)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Create centralized item definitions system ([2a90677](https://github.com/ilyeshdz/escape-game-web/commit/2a90677)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Integrate itemId references in hubspots ([7fe8b35](https://github.com/ilyeshdz/escape-game-web/commit/7fe8b35)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- feat: Update debug spawn command to use centralized items ([6b8f9b7](https://github.com/ilyeshdz/escape-game-web/commit/6b8f9b7)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+- docs: Document new centralized item system ([dbbdf67](https://github.com/ilyeshdz/escape-game-web/commit/dbbdf67)), closes [#23](https://github.com/ilyeshdz/escape-game-web/issues/23)
+
 ## [1.2.1](https://github.com/ilyeshdz/escape-game-web/compare/v1.2.0...v1.2.1) (2026-01-11)
 
 ### Maintenance

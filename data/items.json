@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "description": "Centralized item definitions for the escape game",
+  "items": {
+    "goldenKey": {
+      "name": "Clé dorée",
+      "shortDescription": "Une clé dorée qui brille légèrement",
+      "description": "Une clé dorée qui brille légèrement. Elle semble faite pour ouvrir une serrure spéciale.",
+      "emoji": "🔑",
+      "category": "key",
+      "usable": true,
+      "consumable": true,
+      "destroyable": false,
+      "pickupMessage": "Vous trouvez une clé dorée!"
+    },
+    "potion": {
+      "name": "Potion de soin",
+      "shortDescription": "Restaure 50 points de vie",
+      "description": "Une potion rouge qui restaure 50 points de vie.",
+      "emoji": "🧪",
+      "category": "consumable",
+      "stackable": true,
+      "maxStack": 10,
+      "pickupMessage": "Vous avez trouvé une potion!"
+    },
+    "scroll": {
+      "name": "Grimoire",
+      "shortDescription": "Un ancien livre de sorts",
+      "description": "Un ancien livre de sorts contenant des connaissances oubliées.",
+      "emoji": "📜",
+      "category": "lore",
+      "stackable": false,
+      "destroyable": true,
+      "pickupMessage": "Vous avez trouvé un grimoire!"
+    },
+    "gem": {
+      "name": "Pierre précieuse",
+      "shortDescription": "Une gemme qui brille",
+      "description": "Une gemme qui brille dans l'obscurité. Elle semble avoir de la valeur.",
+      "emoji": "💎",
+      "category": "resource",
+      "stackable": true,
+      "maxStack": 20,
+      "destroyable": true,
+      "pickupMessage": "Vous avez trouvé une pierre précieuse!"
+    },
+    "apple": {
+      "name": "Pomme",
+      "shortDescription": "Une pomme rouge et croquante",
+      "description": "Une pomme rouge et croquante. Elle a l'air délicieusement juteuse.",
+      "emoji": "🍎",
+      "category": "consumable",
+      "stackable": true,
+      "maxStack": 15,
+      "destroyable": true,
+      "pickupMessage": "Vous avez trouvé une pomme!"
+    }
+  }
+}

@@ -2,34 +2,58 @@
 
 The inventory system allows players to collect and use items. The inventory is displayed as a hotbar with 9 slots at the bottom of the screen.
 
-## Item Structure
+## Centralized Item Definitions
 
-Items are given to players through hubspots via the `giveItems` property.
+Items are defined centrally in `data/items.json` to avoid duplication and ensure consistency across the game. This allows items to be referenced by ID across multiple hubspots without redefining them.
 
-### Basic Properties
+### Item Definition Structure
 
-| Property      | Type    | Required | Description                                   |
-| ------------- | ------- | -------- | --------------------------------------------- |
-| `id`          | string  | Yes      | Unique identifier for the item                |
-| `name`        | string  | Yes      | Item name displayed in inventory              |
-| `description` | string  | No       | Item description (shown on double-click)      |
-| `icon`        | string  | No       | Path to item icon image                       |
-| `emoji`       | string  | No       | Emoji to display as icon                      |
-| `usable`      | boolean | No       | If true, player can select and use the item   |
-| `consumable`  | boolean | No       | If true, item is removed after successful use |
+| Property           | Type    | Required | Default | Description                                     |
+| ------------------ | ------- | -------- | ------- | ----------------------------------------------- |
+| `id`               | string  | Yes      | -       | Unique item identifier (key in items object)    |
+| `name`             | string  | Yes      | -       | Display name shown to player                    |
+| `shortDescription` | string  | No       | null    | Brief description for tooltips                  |
+| `description`      | string  | No       | ""      | Full description for item inspection            |
+| `emoji`            | string  | No       | null    | Emoji icon displayed in inventory               |
+| `icon`             | string  | No       | null    | Path to custom icon image                       |
+| `category`         | string  | No       | "misc"  | Item category (key, consumable, resource, lore) |
+| `stackable`        | boolean | No       | false   | Whether item can stack in inventory             |
+| `maxStack`         | number  | No       | 99      | Maximum stack size when stackable               |
+| `usable`           | boolean | No       | false   | Can be selected and used by player              |
+| `consumable`       | boolean | No       | false   | Item is consumed on use                         |
+| `destroyable`      | boolean | No       | true    | Player can discard/destroy the item             |
+| `pickupMessage`    | string  | No       | null    | Message shown when item is picked up            |
+| `useMessage`       | string  | No       | null    | Message shown when item is used                 |
 
-**Display Priority:** `icon` -> `emoji` -> First 2 letters of name
-
-**Example:**
+**Example `data/items.json`:**
 
 ```json
 {
-    "id": "goldenKey",
-    "name": "Golden Key",
-    "description": "An ornate key that looks important.",
-    "emoji": "🔑",
-    "usable": true,
-    "consumable": true
+    "version": "1.0.0",
+    "description": "Centralized item definitions for the escape game",
+    "items": {
+        "goldenKey": {
+            "name": "Golden Key",
+            "shortDescription": "A golden key that shines slightly",
+            "description": "A golden key that shines slightly. It seems made for a special lock.",
+            "emoji": "🔑",
+            "category": "key",
+            "usable": true,
+            "consumable": true,
+            "destroyable": false,
+            "pickupMessage": "You find a golden key!"
+        },
+        "potion": {
+            "name": "Health Potion",
+            "shortDescription": "Restores 50 HP",
+            "description": "A red potion that restores 50 HP.",
+            "emoji": "🧪",
+            "category": "consumable",
+            "stackable": true,
+            "maxStack": 10,
+            "pickupMessage": "You found a potion!"
+        }
+    }
 }
 ```
 
@@ -44,6 +68,15 @@ The inventory is displayed as a hotbar with 9 slots at the bottom of the screen.
 | Selected item  | Green border with glow effect            |
 | Numbered slots | Numbers 1-9 displayed in top-left corner |
 
+### Tooltips
+
+Hovering over an item shows a tooltip with:
+
+- Item icon (emoji or image)
+- Item name
+- Item description
+- Category badges (Utilisable, Consommable)
+
 ## Using the Inventory
 
 | Action                     | Description                               |
@@ -55,7 +88,7 @@ The inventory is displayed as a hotbar with 9 slots at the bottom of the screen.
 
 ## Inventory Conditions
 
-You can control hubspot visibility based on items the player possesses.
+You can control hubspot visibility based on items the player possesses. Use item IDs (not full objects) for conditions.
 
 | Condition         | Description                                         |
 | ----------------- | --------------------------------------------------- |
@@ -75,61 +108,29 @@ You can control hubspot visibility based on items the player possesses.
 }
 ```
 
-## Complete Example
-
-Here's an example showing different item types and how to use them:
-
-### 1. Collectible Item (Non-usable)
+### Using an Item on a Hubspot
 
 ```json
 {
-    "id": "note",
-    "name": "Torn Note",
-    "description": "A piece of paper with numbers written on it.",
-    "emoji": "📜"
+    "id": "door",
+    "type": "useItem",
+    "visibleIn": ["room1"],
+    "x": 80,
+    "y": 50,
+    "emoji": "🚪",
+    "requireItems": ["goldenKey", "flashlight"],
+    "noItemMessage": "You need to select an item to use here.",
+    "wrongItemMessage": "That item doesn't work on this door.",
+    "action": "enterCorridor",
+    "giveFlags": ["doorUnlocked"]
 }
 ```
 
-### 2. Usable Item (Single-use)
+## Complete Examples
 
-```json
-{
-    "id": "goldenKey",
-    "name": "Golden Key",
-    "description": "An ornate key that looks important.",
-    "emoji": "🔑",
-    "usable": true,
-    "consumable": true
-}
-```
+### Giving an Item (Recommended: itemId)
 
-### 3. Usable Item (Multi-use)
-
-```json
-{
-    "id": "flashlight",
-    "name": "Flashlight",
-    "description": "A battery-powered flashlight.",
-    "emoji": "🔦",
-    "usable": true,
-    "consumable": false
-}
-```
-
-### 4. Item with Custom Icon
-
-```json
-{
-    "id": "map",
-    "name": "Treasure Map",
-    "description": "An old map showing the location of treasure.",
-    "icon": "/assets/icons/map.png"
-}
-```
-
-## Usage in Hubspots
-
-### Giving an Item
+Use `itemId` to reference items defined in `data/items.json`:
 
 ```json
 {
@@ -138,13 +139,66 @@ Here's an example showing different item types and how to use them:
     "visibleIn": ["room1"],
     "emoji": "📦",
     "modalText": "You find a treasure chest!",
+    "giveItems": [{ "itemId": "goldenKey" }]
+}
+```
+
+### Giving Multiple Items
+
+```json
+{
+    "id": "treasureRoom",
+    "type": "modal",
+    "visibleIn": ["room2"],
+    "emoji": "💎",
+    "modalText": "You find a treasure room!",
+    "giveItems": [
+        { "itemId": "potion", "quantity": 3 },
+        { "itemId": "goldenKey" },
+        { "itemId": "scroll" }
+    ]
+}
+```
+
+### Legacy: Inline Item Definition (Backward Compatible)
+
+For custom one-off items, you can still define items inline:
+
+```json
+{
+    "id": "chest",
+    "type": "modal",
+    "visibleIn": ["room1"],
+    "emoji": "📦",
+    "modalText": "You find a unique item!",
     "giveItems": [
         {
-            "id": "goldenKey",
-            "name": "Golden Key",
-            "emoji": "🔑",
+            "id": "specialKey",
+            "name": "Special Key",
+            "emoji": "🗝️",
             "usable": true,
             "consumable": true
+        }
+    ]
+}
+```
+
+### Template with Overrides (Advanced)
+
+You can extend a template with custom overrides using `_template`:
+
+```json
+{
+    "id": "chest",
+    "type": "modal",
+    "visibleIn": ["room1"],
+    "emoji": "📦",
+    "modalText": "You find a special key!",
+    "giveItems": [
+        {
+            "_template": "goldenKey",
+            "name": "Ancient Golden Key",
+            "pickupMessage": "You found an ancient golden key!"
         }
     ]
 }
@@ -180,6 +234,112 @@ Here's an example showing different item types and how to use them:
     "wrongItemMessage": "That item doesn't work on this door.",
     "action": "enterCorridor",
     "giveFlags": ["doorUnlocked"]
+}
+```
+
+## Debug Commands
+
+When debug mode is enabled, you can use console commands to manage items:
+
+| Command           | Description                        |
+| ----------------- | ---------------------------------- |
+| `/spawn <itemId>` | Add an item to inventory by its ID |
+| `/items`          | List all available item IDs        |
+| `/clear`          | Clear inventory                    |
+
+**Example:**
+
+```
+/spawn goldenKey
+/items
+/clear
+```
+
+## Debug Commands
+
+When debug mode is enabled, you can use console commands to manage items:
+
+| Command           | Description                        |
+| ----------------- | ---------------------------------- |
+| `/spawn <itemId>` | Add an item to inventory by its ID |
+| `/items`          | List all available item IDs        |
+| `/clear`          | Clear inventory                    |
+
+**Example:**
+
+```
+/spawn goldenKey
+/items
+/clear
+```
+
+## Item Categories
+
+Items can be categorized for organizational purposes. The category affects tooltips and can be used for game logic.
+
+| Category     | Description             | Example Items        |
+| ------------ | ----------------------- | -------------------- |
+| `key`        | Keys that unlock things | goldenKey, silverKey |
+| `consumable` | Items that are used up  | potion, apple, food  |
+| `resource`   | Collectible resources   | gem, ore, coin       |
+| `lore`       | Story items and notes   | scroll, book, letter |
+| `misc`       | Miscellaneous items     | tool, material       |
+
+**Tooltip Display:**
+
+The tooltip shows category-specific badges for usable and consumable items:
+
+- **Utilisable** (green) - Item can be selected and used
+- **Consommable** (red) - Item is consumed on use
+
+## Complete Examples
+
+### 1. Collectible Key (Non-usable until needed)
+
+```json
+{
+    "id": "goldenKey",
+    "name": "Golden Key",
+    "shortDescription": "A golden key that shines slightly",
+    "description": "A golden key that shines slightly. It seems made for a special lock.",
+    "emoji": "🔑",
+    "category": "key",
+    "usable": true,
+    "consumable": true,
+    "destroyable": false,
+    "pickupMessage": "You find a golden key!"
+}
+```
+
+### 2. Stackable Consumable
+
+```json
+{
+    "id": "potion",
+    "name": "Health Potion",
+    "shortDescription": "Restores 50 HP",
+    "description": "A red potion that restores 50 HP.",
+    "emoji": "🧪",
+    "category": "consumable",
+    "stackable": true,
+    "maxStack": 10,
+    "pickupMessage": "You found a potion!"
+}
+```
+
+### 3. Lore Item
+
+```json
+{
+    "id": "scroll",
+    "name": "Ancient Scroll",
+    "shortDescription": "An ancient spellbook",
+    "description": "An ancient spellbook containing forgotten knowledge.",
+    "emoji": "📜",
+    "category": "lore",
+    "stackable": false,
+    "destroyable": true,
+    "pickupMessage": "You found an ancient scroll!"
 }
 ```
 

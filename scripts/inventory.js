@@ -4,6 +4,8 @@
 
 let inventory = [];
 let selectedItem = null;
+let hoveredItem = null;
+let tooltipTimeout = null;
 const INVENTORY_SIZE = 9;
 const STORAGE_KEY = 'escapeGame_inventory';
 
@@ -118,13 +120,6 @@ export function checkInventoryCondition(condition) {
     return true;
 }
 
-export function inspectItem(itemId) {
-    const item = getItem(itemId);
-    if (item) {
-        showInspectModal(item);
-    }
-}
-
 function updateInventoryUI() {
     const slotsContainer = document.getElementById('inventory-items');
     if (!slotsContainer) return;
@@ -144,7 +139,7 @@ function updateInventoryUI() {
         if (item) {
             slot.classList.add('occupied');
             slot.dataset.itemId = item.id;
-            slot.title = item.name;
+            slot.removeAttribute('title');
 
             if (item.icon) {
                 const icon = document.createElement('img');
@@ -171,38 +166,127 @@ function updateInventoryUI() {
             slot.addEventListener('click', () => {
                 selectItem(selectedItem === item.id ? null : item.id);
             });
-            slot.addEventListener('dblclick', () => inspectItem(item.id));
+            slot.addEventListener('mouseenter', (e) => handleSlotHover(item, e));
+            slot.addEventListener('mouseleave', handleSlotLeave);
+            slot.addEventListener('touchstart', (e) => handleSlotTouch(item, e), {
+                passive: false
+            });
         }
 
         slotsContainer.appendChild(slot);
     }
 }
 
-function showInspectModal(item) {
-    const modal = document.getElementById('item-inspect-modal');
-    if (!modal) return;
+function showTooltip(item, event) {
+    const tooltip = document.getElementById('inventory-tooltip');
+    if (!tooltip || !item) return;
 
-    const title = modal.querySelector('#inspect-item-title');
-    const description = modal.querySelector('#inspect-item-description');
-    const icon = modal.querySelector('#inspect-item-icon');
+    const tooltipIcon = document.getElementById('tooltip-icon');
+    const tooltipName = document.getElementById('tooltip-name');
+    const tooltipDescription = document.getElementById('tooltip-description');
+    const tooltipMeta = document.getElementById('tooltip-meta');
 
-    if (title) title.textContent = item.name;
-    if (description) description.textContent = item.description || 'No description available';
-    if (icon) {
+    if (tooltipIcon) {
+        tooltipIcon.innerHTML = '';
         if (item.icon) {
-            icon.src = item.icon;
-            icon.style.display = 'block';
-        } else {
-            icon.style.display = 'none';
+            const img = document.createElement('img');
+            img.src = item.icon;
+            img.alt = item.name;
+            tooltipIcon.appendChild(img);
+        } else if (item.emoji) {
+            tooltipIcon.textContent = item.emoji;
         }
     }
-    modal.classList.add('active');
+
+    if (tooltipName) {
+        tooltipName.textContent = item.name;
+    }
+
+    if (tooltipDescription) {
+        tooltipDescription.textContent = item.description || '';
+        tooltipDescription.style.display = item.description ? 'block' : 'none';
+    }
+
+    if (tooltipMeta) {
+        tooltipMeta.innerHTML = '';
+        if (item.usable) {
+            const usableTag = document.createElement('span');
+            usableTag.className = 'tooltip-meta-item usable';
+            usableTag.textContent = 'Utilisable';
+            tooltipMeta.appendChild(usableTag);
+        }
+        if (item.consumable) {
+            const consumableTag = document.createElement('span');
+            consumableTag.className = 'tooltip-meta-item consumable';
+            consumableTag.textContent = 'Consommable';
+            tooltipMeta.appendChild(consumableTag);
+        }
+        tooltipMeta.style.display = tooltipMeta.children.length > 0 ? 'flex' : 'none';
+    }
+
+    const rect = event.target.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    let x = rect.right + 12;
+    let y = rect.top;
+
+    if (x + tooltipRect.width > window.innerWidth - 20) {
+        x = rect.left - tooltipRect.width - 12;
+    }
+    if (x < 10) {
+        x = 10;
+    }
+
+    if (y + tooltipRect.height > window.innerHeight - 20) {
+        y = window.innerHeight - tooltipRect.height - 20;
+    }
+    if (y < 10) {
+        y = 10;
+    }
+
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+    tooltip.classList.add('visible');
+    tooltip.setAttribute('aria-hidden', 'false');
+    hoveredItem = item.id;
 }
 
-export function hideInspectModal() {
-    const modal = document.getElementById('item-inspect-modal');
-    if (modal) {
-        modal.classList.remove('active');
+function hideTooltip() {
+    const tooltip = document.getElementById('inventory-tooltip');
+    if (tooltip) {
+        tooltip.classList.remove('visible');
+        tooltip.setAttribute('aria-hidden', 'true');
+    }
+    hoveredItem = null;
+}
+
+function handleSlotHover(item, event) {
+    if (tooltipTimeout) {
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = null;
+    }
+    if (item && item.id !== hoveredItem) {
+        showTooltip(item, event);
+    }
+}
+
+function handleSlotLeave() {
+    tooltipTimeout = setTimeout(() => {
+        hideTooltip();
+    }, 150);
+}
+
+function handleSlotTouch(item, event) {
+    event.preventDefault();
+    if (hoveredItem === item.id) {
+        hideTooltip();
+    } else {
+        const touch = event.touches[0];
+        const mockEvent = {
+            target: event.target,
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        };
+        showTooltip(item, mockEvent);
     }
 }
 

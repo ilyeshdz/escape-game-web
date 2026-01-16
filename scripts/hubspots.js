@@ -3,8 +3,9 @@ import { loadHubspotsData } from './hubspotsData.js';
 import { setFlag, unsetFlag, checkCondition } from './flags.js';
 import { addItem, removeItem, getSelectedItemObject } from './inventory.js';
 import { checkInventoryCondition } from './inventory.js';
-import { updateHubspots as updateCanvasHubspots } from './canvasScene.js';
+import { updateHubspots as updateCanvasHubspots, loadScene } from './canvasScene.js';
 import { showHubspotNotification } from './toast.js';
+import { getItemTemplate } from './items.js';
 
 let hubspotsData = [];
 let activeHubspots = [];
@@ -19,18 +20,55 @@ const hubspotHandlers = {
     finish: handleFinishAction,
     link: handleLinkAction,
     secret: showSecretInput,
-    useItem: handleUseItem
+    useItem: handleUseItem,
+    scene: handleSceneTransition
 };
 
-function executeHubspotActions(hubspotData) {
+async function resolveItem(itemDefinition) {
+    if (itemDefinition.itemId) {
+        const template = await getItemTemplate(itemDefinition.itemId);
+        if (!template) {
+            /* eslint-disable no-console */
+            console.warn(`Item not found in central definitions: ${itemDefinition.itemId}`);
+            /* eslint-enable no-console */
+            return null;
+        }
+        return {
+            ...template,
+            ...itemDefinition,
+            id: itemDefinition.itemId
+        };
+    }
+    if (itemDefinition.id) {
+        return itemDefinition;
+    }
+    return null;
+}
+
+async function resolveGiveItems(giveItems) {
+    if (!giveItems || !Array.isArray(giveItems)) {
+        return [];
+    }
+    const resolved = [];
+    for (const itemDef of giveItems) {
+        const resolvedItem = await resolveItem(itemDef);
+        if (resolvedItem) {
+            resolved.push(resolvedItem);
+        }
+    }
+    return resolved;
+}
+
+async function executeHubspotActions(hubspotData) {
     if (hubspotData.giveItems) {
-        hubspotData.giveItems.forEach((item) => {
+        const resolvedItems = await resolveGiveItems(hubspotData.giveItems);
+        for (const item of resolvedItems) {
             if (addItem(item)) {
                 if (item.pickupMessage) {
                     setTimeout(() => showModal(item.pickupMessage), 100);
                 }
             }
-        });
+        }
     }
     if (hubspotData.giveFlags) {
         hubspotData.giveFlags.forEach((flag) => {
@@ -49,11 +87,11 @@ function executeHubspotActions(hubspotData) {
     }
 }
 
-function handleAreaAction(hubspotData) {
+async function handleAreaAction(hubspotData) {
     if (hubspotData.modalText) showModal(hubspotData.modalText);
     if (hubspotData.url) window.open(hubspotData.url, '_blank');
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
         if (hubspotData.win !== undefined) {
@@ -62,30 +100,30 @@ function handleAreaAction(hubspotData) {
     }
 }
 
-function handleModalAction(hubspotData) {
+async function handleModalAction(hubspotData) {
     if (hubspotData.notificationMessage) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     } else {
         showModal(hubspotData.modalText || '');
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
 }
 
-function handleAction(hubspotData) {
+async function handleAction(hubspotData) {
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
 }
 
-function handleFinishAction(hubspotData) {
+async function handleFinishAction(hubspotData) {
     if (hubspotData.action && getStateMachine().transition(hubspotData.action)) {
-        executeHubspotActions(hubspotData);
+        await executeHubspotActions(hubspotData);
         showHubspotNotification(hubspotData);
         updateHubspotsVisibility();
     }
@@ -118,6 +156,44 @@ function handleUseItem(hubspotData) {
     }
 }
 
+/**
+ * Handles scene transition hubspot clicks
+ * @param {Object} hubspotData - Hubspot configuration data
+ */
+async function handleSceneTransition(hubspotData) {
+    const targetScene = hubspotData.targetScene;
+    if (!targetScene) {
+        /* eslint-disable no-console */
+        console.warn('Scene transition hubspot missing targetScene property');
+        /* eslint-enable no-console */
+        return;
+    }
+
+    // Attempt to transition to the target scene
+    if (getStateMachine().transitionToScene(targetScene)) {
+        // Execute any actions defined on the hubspot
+        await executeHubspotActions(hubspotData);
+
+        // Load the new scene background
+        const sceneConfig = getStateMachine().getSceneConfig(targetScene);
+        if (sceneConfig) {
+            loadScene(sceneConfig);
+        }
+
+        // Show notification if defined
+        if (hubspotData.notificationMessage) {
+            showHubspotNotification(hubspotData);
+        }
+
+        // Update hubspots visibility for the new scene
+        updateHubspotsVisibility();
+    } else {
+        showModal(
+            hubspotData.blockedMessage || 'Vous ne pouvez pas accéder à cet endroit pour le moment.'
+        );
+    }
+}
+
 export async function setupHubspots() {
     hubspotsData = await loadHubspotsData();
     if (hubspotsData.length === 0) {
@@ -132,10 +208,16 @@ export function getHubspots() {
 
 export function updateHubspotsVisibility() {
     const currentState = getStateMachine().getState();
+    const currentScene = getStateMachine().getScene();
 
     activeHubspots = hubspotsData
         .map((hubspotData) => {
-            const isVisibleInState = hubspotData.visibleIn.includes(currentState);
+            // Check scene visibility if visibleInScenes is specified
+            const isVisibleInScene =
+                !hubspotData.visibleInScenes || hubspotData.visibleInScenes.includes(currentScene);
+
+            const isVisibleInState =
+                !hubspotData.visibleIn || hubspotData.visibleIn.includes(currentState);
             const meetsConditions =
                 checkCondition({
                     requireFlags: hubspotData.requireFlags,
@@ -148,7 +230,7 @@ export function updateHubspotsVisibility() {
                     requireNotItems: hubspotData.requireNotItems
                 });
 
-            if (isVisibleInState && meetsConditions) {
+            if (isVisibleInScene && isVisibleInState && meetsConditions) {
                 return {
                     ...hubspotData,
                     onClick: (hubspot) => {
@@ -242,7 +324,7 @@ const secretError = document.getElementById('secret-error');
 const secretSubmit = document.getElementById('secret-submit');
 const secretCancel = document.getElementById('secret-cancel');
 
-function checkSecret() {
+async function checkSecret() {
     if (!currentSecretHubspotData) return;
 
     const inputValue = secretInput.value.trim();
@@ -256,13 +338,13 @@ function checkSecret() {
                     break;
                 case 'action':
                     if (action && getStateMachine().transition(action)) {
-                        executeHubspotActions(currentSecretHubspotData);
+                        await executeHubspotActions(currentSecretHubspotData);
                         updateHubspotsVisibility();
                     }
                     break;
                 case 'finish':
                     if (action && getStateMachine().transition(action)) {
-                        executeHubspotActions(currentSecretHubspotData);
+                        await executeHubspotActions(currentSecretHubspotData);
                         updateHubspotsVisibility();
                     }
                     showFinish(win !== undefined ? win : true);
@@ -272,7 +354,7 @@ function checkSecret() {
                         currentSecretHubspotData.action &&
                         getStateMachine().transition(currentSecretHubspotData.action)
                     ) {
-                        executeHubspotActions(currentSecretHubspotData);
+                        await executeHubspotActions(currentSecretHubspotData);
                         updateHubspotsVisibility();
                     }
             }
@@ -280,7 +362,7 @@ function checkSecret() {
             currentSecretHubspotData.action &&
             getStateMachine().transition(currentSecretHubspotData.action)
         ) {
-            executeHubspotActions(currentSecretHubspotData);
+            await executeHubspotActions(currentSecretHubspotData);
             updateHubspotsVisibility();
         }
     } else {
