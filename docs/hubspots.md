@@ -207,6 +207,38 @@ Allows the player to use an item on the hubspot.
 }
 ```
 
+### scene
+
+Transitions between scenes in multi-room games.
+
+**Additional Properties:**
+
+| Property              | Type   | Required | Description                                 |
+| --------------------- | ------ | -------- | ------------------------------------------- |
+| `targetScene`         | string | Yes      | The scene ID to transition to               |
+| `visibleInScenes`     | array  | No       | Array of scene IDs where hubspot is visible |
+| `notificationMessage` | string | No       | Message to display after transition         |
+| `blockedMessage`      | string | No       | Message if transition is not allowed        |
+
+**Example:**
+
+```json
+{
+    "id": "doorToLibrary",
+    "type": "scene",
+    "visibleInScenes": ["foyer"],
+    "visibleIn": ["room1", "safeOpen"],
+    "targetScene": "library",
+    "emoji": "📚",
+    "tooltip": "Aller à la bibliothèque",
+    "notificationMessage": "Vous entrez dans la bibliothèque",
+    "x": 30,
+    "y": 50
+}
+```
+
+See the [Scenes documentation](./scenes.md) for complete multi-room game examples.
+
 ## Giving Items to Players
 
 Multiple hubspot types can give items to the player via the `giveItems` property:
